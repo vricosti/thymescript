@@ -1,0 +1,24 @@
+{
+    "name": "thymeleafjs",
+    "version": "1.0.0",
+    "type": "module",
+    "description": "A template engine for JavaScript that supports the Thymeleaf syntax",
+    "main": "src/thymeleaf.js",
+    "scripts": {
+        "test": "node src/node.js"
+    },
+    "keywords": [
+        "thymeleaf",
+        "template",
+        "engine",
+        "javascript"
+    ],
+    "author": "Your Name",
+    "license": "MIT",
+    "dependencies": {
+        "jsdom": "^21.1.1"
+    },
+    "devDependencies": {
+        "jest": "^27.4.7"
+    }
+}
