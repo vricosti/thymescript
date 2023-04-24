@@ -1,48 +1,103 @@
 import { JSDOM } from 'jsdom';
-const Node = new JSDOM('').window.Node;
+import prettier from 'prettier';
 
 class ThymeleafJs {
-  static evaluateExpression(expression, context) {
-    const matches = expression.match(/@\{(.+?)\}/g);
-    if (!matches) {
-      return expression;
-    }
-    matches.forEach((match) => {
-      const expressionToEvaluate = match.slice(2, -1);
-      const value = eval(expressionToEvaluate);
-      expression = expression.replace(match, value || '');
-    });
-    return expression;
+  constructor() {
+    this.directives = {
+      'vr:text': this.processText,
+      'vr:if': this.processIf,
+      'vr:attr': this.processAttr,
+      'vr:class': this.processClass,
+      'vr:each': this.processEach,
+    };
   }
 
-  static processNode(node, context) {
-    if (!node.attributes) return;
-    const attributeNodes = Array.from(node.attributes);
-    attributeNodes.forEach((attribute) => {
-      const attributeName = attribute.name;
-      const attributeValue = ThymeleafJs.evaluateExpression(attribute.value, context);
-      node.setAttribute(attributeName, attributeValue);
-    });
-    if (node.nodeType === Node.TEXT_NODE) {
-      node.textContent = ThymeleafJs.evaluateExpression(node.textContent, context);
-    }
-  }
-
-  static processChildNodes(node, context) {
-    const nodes = Array.from(node.childNodes);
-    nodes.forEach((childNode) => {
-      ThymeleafJs.processNode(childNode, context);
-      ThymeleafJs.processChildNodes(childNode, context);
-    });
-  }
-
-  static render(html, context) {
+  render(html, context) {
     const dom = new JSDOM(html);
-    const rootNode = dom.window.document.body;
-    ThymeleafJs.processNode(rootNode, context);
-    ThymeleafJs.processChildNodes(rootNode, context);
-    return rootNode.innerHTML;
+    const document = dom.window.document;
+    this.processNode(document.body, context);
+    const formattedHtml = prettier.format(dom.serialize(), { parser: 'html' });
+    return formattedHtml;
   }
+
+  processNode(node, context) {
+    if (node.nodeType === 1) {
+      //console.log('node.nodeType: ', node.nodeType);
+      for (const attr of Array.from(node.attributes)) {
+        const directiveFn = this.directives[attr.name];
+        if (directiveFn) {
+          directiveFn.call(this, node, attr, context);
+          node.removeAttribute(attr.name);
+        }
+      }
+
+      //console.log('node.childNodes: ', node.childNodes);
+      for (const child of Array.from(node.childNodes)) {
+        this.processNode(child, context);
+      }
+    }
+  }
+
+  processText(node, attr, context) {
+    const text = this.evaluate(attr.value, context);
+    console.log('processText with text: ', text);
+    node.textContent = text;
+  }
+
+  processIf(node, attr, context) {
+    console.log('Entering processIf');
+    console.log(`attr.value=${attr.value} context=${context}`);
+    const condition = this.evaluate(attr.value, context);
+    if (!condition) {
+      node.remove();
+    }
+  }
+
+  processAttr(node, attr, context) {
+    const [name, expression] = attr.value.split('=');
+    const value = this.evaluate(expression, context);
+    node.setAttribute(name, value);
+  }
+
+  processClass(node, attr, context) {
+    const className = this.evaluate(attr.value, context);
+    node.setAttribute('class', className);
+  }
+
+  processEach(node, attr, context) {
+    const [varName, expression] = attr.value.split(':');
+    const dataArray = this.evaluate(expression, context);
+
+    const parent = node.parentNode;
+    node.removeAttribute(attr.name);
+
+    for (const item of dataArray) {
+      if (item === null) continue;
+
+      const clone = node.cloneNode(true);
+      const newContext = { ...context, [varName]: item };
+      this.processNode(clone, newContext);
+      parent.insertBefore(clone, node);
+    }
+
+    parent.removeChild(node);
+  }
+
+  evaluate(expression, context) {
+    const code = expression.replace(/\{(.*?)\}/g, (_, expr) => `\${${expr}}`);
+    const contextKeys = Object.keys(context);
+    const contextValues = Object.values(context);
+
+    console.log('code: ', code);
+    console.log('contextKeys: ', contextKeys);
+    console.log('contextValues: ', contextValues);
+    const func = new Function(...contextKeys, `return \`${code}\`;`);
+    return func(...contextValues);
+  }
+  
 }
 
 export default ThymeleafJs;
+
+
+
