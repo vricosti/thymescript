@@ -6,6 +6,7 @@ class ThymeleafJs {
     this.directives = {
       'vr:text': this.processText,
       'vr:if': this.processIf,
+      'vr:unless': this.processUnless,
       'vr:attr': this.processAttr,
       'vr:class': this.processClass,
       'vr:each': this.processEach,
@@ -13,13 +14,30 @@ class ThymeleafJs {
   }
 
   render(html, context) {
-    const dom = new JSDOM(html);
+    const dom = new JSDOM(`<!DOCTYPE html>${html}`);
     const document = dom.window.document;
     this.processNode(document.body, context);
-    const formattedHtml = prettier.format(dom.serialize(), { parser: 'html' });
-    return formattedHtml;
+  
+    const hasHtmlTag = /<html[\s\S]*?>/i.test(html);
+    if (hasHtmlTag) {
+      const formattedHtml = prettier.format(dom.serialize(), { parser: 'html' });
+      return formattedHtml;
+    } else {
+      const formattedHtml = prettier.format(document.body.innerHTML, { parser: 'html' });
+      return formattedHtml;
+    }
   }
+  
 
+  removeEmptyTextNodes(node) {
+    if (node.previousSibling && node.previousSibling.nodeType === 3 && !/\S/.test(node.previousSibling.textContent)) {
+      node.parentNode.removeChild(node.previousSibling);
+    }
+    if (node.nextSibling && node.nextSibling.nodeType === 3 && !/\S/.test(node.nextSibling.textContent)) {
+      node.parentNode.removeChild(node.nextSibling);
+    }
+  }
+  
   processNode(node, context) {
     if (node.nodeType === 1) {
       //console.log('node.nodeType: ', node.nodeType);
@@ -49,6 +67,15 @@ class ThymeleafJs {
     console.log(`attr.value=${attr.value} context=${context}`);
     const condition = this.evaluate(attr.value, context);
     if (!condition) {
+      this.removeEmptyTextNodes(node);
+      node.remove();
+    }
+  }
+
+  processUnless(node, attr, context) {
+    const condition = this.evaluate(attr.value, context);
+    if (condition) {
+      this.removeEmptyTextNodes(node);
       node.remove();
     }
   }
@@ -84,16 +111,25 @@ class ThymeleafJs {
   }
 
   evaluate(expression, context) {
-    const code = expression.replace(/\{(.*?)\}/g, (_, expr) => `\${${expr}}`);
     const contextKeys = Object.keys(context);
     const contextValues = Object.values(context);
-
-    console.log('code: ', code);
-    console.log('contextKeys: ', contextKeys);
-    console.log('contextValues: ', contextValues);
-    const func = new Function(...contextKeys, `return \`${code}\`;`);
+    const expr = expression.replace(/\{(.*?)\}/g, '$1');
+  
+    const func = new Function(...contextKeys, `return (${expr});`);
     return func(...contextValues);
   }
+
+  // evaluate(expression, context) {
+  //   const code = expression.replace(/\{(.*?)\}/g, (_, expr) => `\${${expr}}`);
+  //   const contextKeys = Object.keys(context);
+  //   const contextValues = Object.values(context);
+
+  //   console.log('code: ', code);
+  //   console.log('contextKeys: ', contextKeys);
+  //   console.log('contextValues: ', contextValues);
+  //   const func = new Function(...contextKeys, `return \`${code}\`;`);
+  //   return func(...contextValues);
+  // }
   
 }
 
