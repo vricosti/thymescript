@@ -39,27 +39,73 @@ class ThymeleafJs {
   }
   
   processNode(node, context) {
-    if (node.nodeType === 1) {
-      //console.log('node.nodeType: ', node.nodeType);
-      for (const attr of Array.from(node.attributes)) {
-        const directiveFn = this.directives[attr.name];
-        if (directiveFn) {
-          directiveFn.call(this, node, attr, context);
-          node.removeAttribute(attr.name);
-        }
+    if (node.nodeType === 3) {
+      this.processText(node);
+    } else if (node.nodeType === 1) {
+      // Iterate through the attributes of the element
+      for (let i = 0; i < node.attributes.length; i++) {
+        const attr = node.attributes[i];
+        this.processAttr(attr, node);
       }
-
-      //console.log('node.childNodes: ', node.childNodes);
-      for (const child of Array.from(node.childNodes)) {
-        this.processNode(child, context);
-      }
+  
+      node.childNodes.forEach((childNode) => {
+        this.processNode(childNode);
+      });
     }
   }
 
-  processText(node, attr, context) {
-    const text = this.evaluate(attr.value, context);
-    console.log('processText with text: ', text);
-    node.textContent = text;
+  processNode(node, context) {
+    if (node.nodeType === 3) { // Node.TEXT_NODE is 3
+      return this.processText(node.textContent, context);
+    }
+
+    if (node.nodeType !== 1) { // Node.ELEMENT_NODE is 1
+      return node.cloneNode(true);
+    }
+
+    if (node.hasAttribute("vr:each")) {
+      return this.processEach(node, context);
+    }
+
+    if (node.hasAttribute("vr:if")) {
+      const newNode = node.cloneNode(true);
+      newNode.removeAttribute("vr:if");
+      const condition = this.processIf(newNode, context);
+      if (condition) {
+        return this.processNode(newNode, context);
+      } else {
+        return null;
+      }
+    }
+
+    const newNode = node.cloneNode(false);
+
+    Array.from(node.attributes).forEach((attr) => {
+      if (attr.name === "vr:attr") {
+        this.processAttr(newNode, attr.value, context);
+      } else {
+        newNode.setAttribute(attr.name, attr.value);
+      }
+    });
+
+    Array.from(node.childNodes).forEach((childNode) => {
+      const processedChild = this.processNode(childNode, context);
+      if (processedChild) {
+        newNode.appendChild(processedChild);
+      }
+    });
+
+    return newNode;
+  }
+
+
+  processText(node, context) {
+    if (node.nodeType !== 3) return;
+  
+    const text = this.evaluate(node.nodeValue, context);
+    if (text) {
+      node.nodeValue = text;
+    }
   }
 
   processIf(node, attr, context) {
@@ -81,10 +127,26 @@ class ThymeleafJs {
   }
 
   processAttr(node, attr, context) {
+    console.log('attr:', JSON.stringify(attr, null, 2));
+    if (!attr.name.startsWith(this.prefix + ':')) return;
+  
+    const directiveName = attr.name.substring(this.prefix.length + 1);
     const [name, expression] = attr.value.split('=');
-    const value = this.evaluate(expression, context);
-    node.setAttribute(name, value);
+    console.log('directiveName: ', directiveName);
+    console.log('name: ', name);
+    console.log('expression: ', expression);
+    
+    switch (directiveName) {
+      case 'attr':
+        const result = this.evaluate(expression, context);
+        node.setAttribute(name, result);
+        node.removeAttribute(attr.name);
+        break;
+      default:
+        break;
+    }
   }
+
 
   processClass(node, attr, context) {
     const className = this.evaluate(attr.value, context);
@@ -110,13 +172,23 @@ class ThymeleafJs {
     parent.removeChild(node);
   }
 
-  evaluate(expression, context) {
-    const contextKeys = Object.keys(context);
-    const contextValues = Object.values(context);
-    const expr = expression.replace(/\{(.*?)\}/g, '$1');
+  evaluate(code, context) {
+    if (!code) return '';
   
+    const contextKeys = Object.keys(context);
+    const expr = code.replace(/\{(.*?)\}/g, '$1');
     const func = new Function(...contextKeys, `return (${expr});`);
-    return func(...contextValues);
+    console.log('code: ', code);
+    console.log('expr: ', expr);
+    console.log('contextKeys: ', contextKeys);
+  
+    try {
+      return func(...contextKeys.map((key) => context[key]));
+    } catch (error) {
+      console.error(`Error evaluating: ${code}`);
+      console.error(error);
+      return '';
+    }
   }
 
   // evaluate(expression, context) {
