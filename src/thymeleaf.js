@@ -1,7 +1,13 @@
 import { JSDOM } from 'jsdom';
 import prettier from 'prettier';
 
+  // Declare constants inside the class
+  const ELEMENT_NODE = 1;
+  const TEXT_NODE = 3;
+
 class ThymeleafJs {
+
+
   constructor() {
     this.directives = {
       'vr:text': this.processText,
@@ -30,16 +36,16 @@ class ThymeleafJs {
   
 
   removeEmptyTextNodes(node) {
-    if (node.previousSibling && node.previousSibling.nodeType === 3 && !/\S/.test(node.previousSibling.textContent)) {
+    if (node.previousSibling && node.previousSibling.nodeType === TEXT_NODE && !/\S/.test(node.previousSibling.textContent)) {
       node.parentNode.removeChild(node.previousSibling);
     }
-    if (node.nextSibling && node.nextSibling.nodeType === 3 && !/\S/.test(node.nextSibling.textContent)) {
+    if (node.nextSibling && node.nextSibling.nodeType === TEXT_NODE && !/\S/.test(node.nextSibling.textContent)) {
       node.parentNode.removeChild(node.nextSibling);
     }
   }
   
   processNode(node, context) {
-    if (node.nodeType === 1) {
+    if (node.nodeType === ELEMENT_NODE) {
       //console.log('node.nodeType: ', node.nodeType);
       for (const attr of Array.from(node.attributes)) {
         const directiveFn = this.directives[attr.name];
@@ -58,13 +64,13 @@ class ThymeleafJs {
 
   processText(node, attr, context) {
     const text = this.evaluate(attr.value, context);
-    console.log('processText with text: ', text);
+    //console.log('processText with text: ', text);
     node.textContent = text;
   }
 
   processIf(node, attr, context) {
-    console.log('Entering processIf');
-    console.log(`attr.value=${attr.value} context=${context}`);
+    //console.log('Entering processIf');
+    //console.log(`attr.value=${attr.value} context=${context}`);
     const condition = this.evaluate(attr.value, context);
     if (!condition) {
       this.removeEmptyTextNodes(node);
@@ -114,7 +120,10 @@ class ThymeleafJs {
     const contextKeys = Object.keys(context);
     const contextValues = Object.values(context);
     const expr = expression.replace(/\{(.*?)\}/g, '$1');
-  
+    // console.log('contextKeys: ', contextKeys);
+    // console.log('contextValues: ', contextValues);
+    // console.log('expr: ', expr);
+
     const func = new Function(...contextKeys, `return (${expr});`);
     return func(...contextValues);
   }

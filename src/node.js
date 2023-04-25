@@ -27,7 +27,7 @@ const html01 = `
 `;
 const modifiedHtml01 = thymeleaf.render(html01, context01);
 console.log(modifiedHtml01);
-/*
+
 const expectedHtml01 = `
 <html>
   <head></head>
@@ -38,7 +38,7 @@ const expectedHtml01 = `
   </body>
 </html>
 `;
-*/
+
 
 // Example02
 const context02 = { condition: false };
@@ -52,15 +52,15 @@ const html02 = `
 `;
 const modifiedHtml02 = thymeleaf.render(html02, context02);
 console.log(modifiedHtml02);
-/*
+
 const expectedHtml02 = `
 <span class="base condition-false">
    This HTML is duplicated. We probably want a better solution.
 </span>
 `;
-*/
 
-const context03 = { condition: true };
+// Example03
+const context03 = { condition: false };
 const html03 = `
 <span vr:attr="class={condition ? 'base condition-true' : 'base condition-false'}">
    This HTML is consolidated, which is good, but the Thymeleaf attribute still has some redundancy in it.
@@ -74,37 +74,38 @@ const expectedHtml03 = `
 </span>
 `;
 
-const context04 = {
-  anObject: [
-    { creation: "2023-04-20", requestId: "1", status: "active" },
-    { creation: "2023-04-19", requestId: "2", status: "inactive" },
-    null,
-    { creation: "2023-04-18", requestId: "3", status: "active" },
-  ]
-};
-const html04 = `
-<table class="table" style="margin-bottom: 0;">
-  <tr vr:each="value : {anObject}" vr:if="{value != null}" data-request-id="{value.requestId}" data-status-id="{value.status}">
-    <td vr:text="{value.creation}">DefaultValue</td>
-  </tr>
-</table>
-`;
-const modifiedHtml04 = thymeleaf.render(html04, context04);
-console.log(modifiedHtml04);
+// // Example04
+// const context04 = {
+//   anObject: [
+//     { creation: "2023-04-20", requestId: "1", status: "active" },
+//     { creation: "2023-04-19", requestId: "2", status: "inactive" },
+//     null,
+//     { creation: "2023-04-18", requestId: "3", status: "active" },
+//   ]
+// };
+// const html04 = `
+// <table class="table" style="margin-bottom: 0;">
+//   <tr vr:each="value : {anObject}" vr:if="{value != null}" data-request-id="{value.requestId}" data-status-id="{value.status}">
+//     <td vr:text="{value.creation}">DefaultValue</td>
+//   </tr>
+// </table>
+// `;
+// const modifiedHtml04 = thymeleaf.render(html04, context04);
+// console.log(modifiedHtml04);
 
-const expectedHtml04 = `
-<table class="table" style="margin-bottom: 0;">
-  <tr data-request-id="1" data-status-id="active">
-    <td>2023-04-20</td>
-  </tr>
-  <tr data-request-id="2" data-status-id="inactive">
-    <td>2023-04-19</td>
-  </tr>
-  <tr data-request-id="3" data-status-id="active">
-    <td>2023-04-18</td>
-  </tr>
-</table>
-`;
+// const expectedHtml04 = `
+// <table class="table" style="margin-bottom: 0;">
+//   <tr data-request-id="1" data-status-id="active">
+//     <td>2023-04-20</td>
+//   </tr>
+//   <tr data-request-id="2" data-status-id="inactive">
+//     <td>2023-04-19</td>
+//   </tr>
+//   <tr data-request-id="3" data-status-id="active">
+//     <td>2023-04-18</td>
+//   </tr>
+// </table>
+// `;
 
 
 
