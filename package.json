@@ -16,6 +16,7 @@
     "author": "Your Name",
     "license": "MIT",
     "dependencies": {
+        "dom-compare": "^0.6.0",
         "jsdom": "^21.1.1",
         "prettier": "^2.8.8"
     },
