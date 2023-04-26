@@ -11,6 +11,7 @@ class ThymeleafJs {
   constructor() {
     this.directives = {
       'vr:text': this.processText,
+      'vr:utext': this.processUText,
       'vr:if': this.processIf,
       'vr:unless': this.processUnless,
       'vr:attr': this.processAttr,
@@ -20,16 +21,19 @@ class ThymeleafJs {
   }
 
   render(html, context) {
-    const dom = new JSDOM(`<!DOCTYPE html>${html}`);
+    const dom = new JSDOM(`${html}`);
     const document = dom.window.document;
     this.processNode(document.body, context);
+    //return document.body.innerHTML;
   
     const hasHtmlTag = /<html[\s\S]*?>/i.test(html);
     if (hasHtmlTag) {
-      const formattedHtml = prettier.format(dom.serialize(), { parser: 'html' });
+      const formattedHtml = dom.serialize();
+      //const formattedHtml = prettier.format(dom.serialize(), { parser: 'html' });
       return formattedHtml;
     } else {
-      const formattedHtml = prettier.format(document.body.innerHTML, { parser: 'html' });
+      const formattedHtml = document.body.innerHTML;
+      //const formattedHtml = prettier.format(document.body.innerHTML, { parser: 'html' });
       return formattedHtml;
     }
   }
@@ -62,15 +66,19 @@ class ThymeleafJs {
     }
   }
 
+  processUText(node, attr, context) {
+    const text = this.evaluate(attr.value, context);
+    node.innerHTML = text;
+  }
+
   processText(node, attr, context) {
     const text = this.evaluate(attr.value, context);
-    //console.log('processText with text: ', text);
     node.textContent = text;
   }
 
   processIf(node, attr, context) {
-    //console.log('Entering processIf');
-    //console.log(`attr.value=${attr.value} context=${context}`);
+    
+    console.log(`processIf: attr.value=${attr.value} context=${context}`);
     const condition = this.evaluate(attr.value, context);
     if (!condition) {
       this.removeEmptyTextNodes(node);
@@ -109,6 +117,7 @@ class ThymeleafJs {
 
       const clone = node.cloneNode(true);
       const newContext = { ...context, [varName]: item };
+      console.log('newContext= ', newContext);
       this.processNode(clone, newContext);
       parent.insertBefore(clone, node);
     }
@@ -120,11 +129,18 @@ class ThymeleafJs {
     const contextKeys = Object.keys(context);
     const contextValues = Object.values(context);
     const expr = expression.replace(/\{(.*?)\}/g, '$1');
-    // console.log('contextKeys: ', contextKeys);
-    // console.log('contextValues: ', contextValues);
-    // console.log('expr: ', expr);
+  
+    const updatedExpr = expr.replace(/(\b)and(\b)/gi, ' && ')
+                          .replace(/(\b)or(\b)/gi, ' || ')
+                          .replace(/(\b)gt(\b)/gi, ' > ')
+                          .replace(/(\b)lt(\b)/gi, ' < ')
+                          .replace(/(\b)ge(\b)/gi, ' >= ')
+                          .replace(/(\b)le(\b)/gi, ' =< ')
+                          .replace(/(\b)not(\b)/gi, ' ! ');
 
-    const func = new Function(...contextKeys, `return (${expr});`);
+    console.log('updatedExpr: ', updatedExpr);
+
+    const func = new Function(...contextKeys, `return (${updatedExpr});`);
     return func(...contextValues);
   }
 
