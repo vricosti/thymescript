@@ -164,6 +164,3 @@ class ThymeleafJs {
 }
 
 export default ThymeleafJs;
-
-
-

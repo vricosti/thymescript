@@ -62,7 +62,21 @@ const context01 = {
     "age": 35,
     "subject": "Mathematics",
     "active": true,
-  }
+  },
+  friends: {
+    'Leonardo DiCaprio': { 
+      age: 47, 
+      email: 'leo.dicaprio@gmail.com' 
+    },
+    'Meryl Streep': { 
+      age: 72, 
+      email: 'meryl.streep@yahoo.com' 
+    },
+    'Tom Hanks': { 
+      age: 65, 
+      email: 'tom.hanks@hotmail.com' 
+    }
+  },
 };
 
 const html01 = `
@@ -79,7 +93,11 @@ const html01 = `
     <p vr:if="{teacher.gender == 'M'}">Male</p>
     <p vr:unless="{teacher.gender == 'M'}">Female</p>
     <p vr:if="{teacher.age &gt; 29 and teacher.age &lt; 49}">Middle age</p>
-    <p vr:if="{teacher.age gt  29 and teacher.age lt 49}">Middle age</p> 
+    <p vr:if="{teacher.age gt  29 and teacher.age lt 49}">Middle age</p>
+    <div vr:object = "{friends['Tom Hanks']}" class="box">
+      <p><b>Age:</b> <span vr:utext="*{age}"></span></p>
+      <p><b>Email:</b> <span vr:utext="*{email}"></span></p>
+    </div>
   </body>
 </html>
 `;
@@ -97,6 +115,10 @@ const expectedHtml01 = `
     <p>Male</p>
     <p>Middle age</p>
     <p>Middle age</p>
+    <div class="box">
+      <p><b>Age:</b> <span>65</span></p>
+      <p><b>Email:</b> <span>tom.hanks@hotmail.com</span></p>
+    </div>
   </body>
 </html>
 `;
