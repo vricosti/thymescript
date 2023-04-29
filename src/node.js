@@ -37,7 +37,7 @@ function renderAndCompare(msg, templateHtml, context, expectedHtml) {
   
   console.log(msg);
 
-  const renderedHtml = thymeleaf.render(templateHtml, context);
+  const renderedHtml = ThymeleafJs.render(templateHtml, context);
   console.log(renderedHtml);
   const parser = createDOMParser();
   const docRendered = parser.parseFromString(renderedHtml, 'text/html');
@@ -51,8 +51,6 @@ function renderAndCompare(msg, templateHtml, context, expectedHtml) {
   }
 }
 
-
-const thymeleaf = new ThymeleafJs();
 
 // Example01
 const context01 = {
@@ -152,7 +150,7 @@ renderAndCompare('Example03', html03, context03, expectedHtml03);
 //   </tr>
 // </table>
 // `;
-// const modifiedHtml04 = thymeleaf.render(html04, context04);
+// const modifiedHtml04 = ThymeleafJs.render(html04, context04);
 // console.log(modifiedHtml04);
 
 // const expectedHtml04 = `

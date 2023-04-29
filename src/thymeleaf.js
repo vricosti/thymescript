@@ -20,6 +20,24 @@ class ThymeleafJs {
     };
   }
 
+  // static createDOMParser(html) {
+  //   if (typeof window !== 'undefined' && 'DOMParser' in window) {
+  //     // Browser environment
+  //     console.log('Browser environment');
+  //     const parser = new DOMParser();
+  //     return parser.parseFromString(html, 'text/html');
+  //   } else {
+  //     // Node.js environment
+  //     console.log('Node.js environment');
+  //     return new JSDOM(html).window.document;
+  //   }
+  // }
+
+  static render(html, context) {
+    const thymeleaf = new ThymeleafJs();
+    return thymeleaf.render(html, context);
+  }
+
   render(html, context) {
     const dom = new JSDOM(`${html}`);
     const document = dom.window.document;
@@ -143,19 +161,6 @@ class ThymeleafJs {
     const func = new Function(...contextKeys, `return (${updatedExpr});`);
     return func(...contextValues);
   }
-
-  // evaluate(expression, context) {
-  //   const code = expression.replace(/\{(.*?)\}/g, (_, expr) => `\${${expr}}`);
-  //   const contextKeys = Object.keys(context);
-  //   const contextValues = Object.values(context);
-
-  //   console.log('code: ', code);
-  //   console.log('contextKeys: ', contextKeys);
-  //   console.log('contextValues: ', contextValues);
-  //   const func = new Function(...contextKeys, `return \`${code}\`;`);
-  //   return func(...contextValues);
-  // }
-  
 }
 
 export default ThymeleafJs;
