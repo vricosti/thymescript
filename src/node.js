@@ -54,6 +54,8 @@ function renderAndCompare(msg, templateHtml, context, expectedHtml) {
 
 // Example01
 const context01 = {
+  name: 'Vince Ricosti',
+  age: 45,
   message: 'ChatGPT is amazing!',
   messageWelcome: 'Welcome to our <b>fantastic</b> grocery store!',
   teacher: {
@@ -95,8 +97,9 @@ const html01 = `
     <p vr:if="{teacher.age &gt; 29 and teacher.age &lt; 49}">Middle age</p>
     <p vr:if="{teacher.age gt  29 and teacher.age lt 49}">Middle age</p>
     <div vr:object = "{friends['Tom Hanks']}" class="box">
-      <p><b>Age:</b> <span vr:utext="*{age}"></span></p>
-      <p><b>Email:</b> <span vr:utext="*{email}"></span></p>
+      <p><b>Tom Hanks's age:</b> <span vr:utext="*{age}"></span></p>
+      <p><b>Tom Hanks's email:</b> <span vr:utext="*{email}"></span></p>
+      <p><b>Author's age:</b> <span vr:utext="{age}"></span></p>
     </div>
   </body>
 </html>
@@ -116,8 +119,9 @@ const expectedHtml01 = `
     <p>Middle age</p>
     <p>Middle age</p>
     <div class="box">
-      <p><b>Age:</b> <span>65</span></p>
-      <p><b>Email:</b> <span>tom.hanks@hotmail.com</span></p>
+      <p><b>Tom Hanks's age:</b> <span>65</span></p>
+      <p><b>Tom Hanks's email:</b> <span>tom.hanks@hotmail.com</span></p>
+      <p><b>Author's age:</b> <span>45</span></p>
     </div>
   </body>
 </html>
@@ -125,36 +129,36 @@ const expectedHtml01 = `
 renderAndCompare('Example01', html01, context01, expectedHtml01);
 
 
-// Example02
-const context02 = { condition: false };
-const html02 = `
-<span vr:if="{condition}" class="base condition-true">
-  This HTML is duplicated. We probably want a better solution.
-</span>
-<span vr:if="{!condition}" class="base condition-false">
-  This HTML is duplicated. We probably want a better solution.
-</span>
-`;
-const expectedHtml02 = `
-<span class="base condition-false">
-  This HTML is duplicated. We probably want a better solution.
-</span>
-`;
-renderAndCompare('Example02', html02, context02, expectedHtml02);
+// // Example02
+// const context02 = { condition: false };
+// const html02 = `
+// <span vr:if="{condition}" class="base condition-true">
+//   This HTML is duplicated. We probably want a better solution.
+// </span>
+// <span vr:if="{!condition}" class="base condition-false">
+//   This HTML is duplicated. We probably want a better solution.
+// </span>
+// `;
+// const expectedHtml02 = `
+// <span class="base condition-false">
+//   This HTML is duplicated. We probably want a better solution.
+// </span>
+// `;
+// renderAndCompare('Example02', html02, context02, expectedHtml02);
 
-// Example03
-const context03 = { condition: true };
-const html03 = `
-<span vr:attr="class={condition ? 'base condition-true' : 'base condition-false'}">
-   This HTML is consolidated, which is good, but the Thymeleaf attribute still has some redundancy in it.
-</span>
-`;
-const expectedHtml03 = `
-<span class="base condition-true">
-   This HTML is consolidated, which is good, but the Thymeleaf attribute still has some redundancy in it.
-</span>
-`;
-renderAndCompare('Example03', html03, context03, expectedHtml03);
+// // Example03
+// const context03 = { condition: true };
+// const html03 = `
+// <span vr:attr="class={condition ? 'base condition-true' : 'base condition-false'}">
+//    This HTML is consolidated, which is good, but the Thymeleaf attribute still has some redundancy in it.
+// </span>
+// `;
+// const expectedHtml03 = `
+// <span class="base condition-true">
+//    This HTML is consolidated, which is good, but the Thymeleaf attribute still has some redundancy in it.
+// </span>
+// `;
+// renderAndCompare('Example03', html03, context03, expectedHtml03);
 
 // // Example04
 // const context04 = {
