@@ -1,14 +1,16 @@
 import { JSDOM } from 'jsdom';
 import prettier from 'prettier';
 
-  // Declare constants inside the class
-  const ELEMENT_NODE = 1;
-  const TEXT_NODE = 3;
+// Declare constants inside the class
+const ELEMENT_NODE = 1;
+const TEXT_NODE = 3;
 
 class ThymeleafJs {
 
 
   constructor() {
+    this.localContext = null;
+
     this.directives = {
       'vr:text': this.processText,
       'vr:utext': this.processUText,
@@ -16,6 +18,7 @@ class ThymeleafJs {
       'vr:unless': this.processUnless,
       'vr:attr': this.processAttr,
       'vr:class': this.processClass,
+      'vr:object': this.processObject, 
       'vr:each': this.processEach,
     };
   }
@@ -43,7 +46,7 @@ class ThymeleafJs {
     const document = dom.window.document;
     this.processNode(document.body, context);
     //return document.body.innerHTML;
-  
+
     const hasHtmlTag = /<html[\s\S]*?>/i.test(html);
     if (hasHtmlTag) {
       const formattedHtml = dom.serialize();
@@ -55,7 +58,7 @@ class ThymeleafJs {
       return formattedHtml;
     }
   }
-  
+
 
   removeEmptyTextNodes(node) {
     if (node.previousSibling && node.previousSibling.nodeType === TEXT_NODE && !/\S/.test(node.previousSibling.textContent)) {
@@ -65,24 +68,48 @@ class ThymeleafJs {
       node.parentNode.removeChild(node.nextSibling);
     }
   }
-  
+
   processNode(node, context) {
+
     if (node.nodeType === ELEMENT_NODE) {
+
+      if (node.hasAttribute('vr:object')) {
+        let objectAttr = node.getAttributeNode('vr:object');
+        this.processObject(node, objectAttr, context);
+        node.removeAttribute('vr:object');
+      }
+
+      // Use the local context if it's set, otherwise use the original context
+      let newContext = this.localContext || context;
+
       //console.log('node.nodeType: ', node.nodeType);
       for (const attr of Array.from(node.attributes)) {
+        
+        // Skip the vr:object attribute because we already processed it
+        if (attr.name === 'vr:object') continue;
+
         const directiveFn = this.directives[attr.name];
         if (directiveFn) {
-          directiveFn.call(this, node, attr, context);
+          directiveFn.call(this, node, attr, newContext);
           node.removeAttribute(attr.name);
         }
       }
 
       //console.log('node.childNodes: ', node.childNodes);
-      for (const child of Array.from(node.childNodes)) {
-        this.processNode(child, context);
+      for (const childNode of Array.from(node.childNodes)) {
+        this.processNode(childNode, this.localContext || context);
       }
     }
+
+    // Reset the local context to null after processing the child nodes
+    this.localContext = null;
   }
+
+  processObject(node, attr, context) {
+    let localContextExpr = node.getAttribute('vr:object');
+    this.localContext = this.evaluate(localContextExpr, context);
+  }
+
 
   processUText(node, attr, context) {
     const text = this.evaluate(attr.value, context);
@@ -95,7 +122,7 @@ class ThymeleafJs {
   }
 
   processIf(node, attr, context) {
-    
+
     console.log(`processIf: attr.value=${attr.value} context=${context}`);
     const condition = this.evaluate(attr.value, context);
     if (!condition) {
@@ -144,23 +171,65 @@ class ThymeleafJs {
   }
 
   evaluate(expression, context) {
-    const contextKeys = Object.keys(context);
-    const contextValues = Object.values(context);
-    const expr = expression.replace(/\{(.*?)\}/g, '$1');
+    // Check if the expression uses the *{} notation
+    let expr = expression.replace(/\{(.*?)\}/g, '$1');
+
+    expr = expr.replace(/(\b)and(\b)/gi, ' && ')
+      .replace(/(\b)or(\b)/gi, ' || ')
+      .replace(/(\b)gt(\b)/gi, ' > ')
+      .replace(/(\b)lt(\b)/gi, ' < ')
+      .replace(/(\b)ge(\b)/gi, ' >= ')
+      .replace(/(\b)le(\b)/gi, ' =< ')
+      .replace(/(\b)not(\b)/gi, ' ! ');
+
+    // When evaluating, use the local context if it's set, otherwise use the context passed
+    let actualContext = this.localContext || context;
+
+    // Get the keys and values of the actual context
+    const actualContextKeys = Object.keys(actualContext);
+    const actualContextValues = Object.values(actualContext);
+
+    // Replace *{ with { in the expression before evaluating
+    // Also, remove * if it's used outside of curly braces
+    let actualExpr = expr.replace(/\*\{/g, '{').replace(/\*/g, '');
+
+    console.log('actualExpr: ', actualExpr);
+    console.log('actualContextKeys: ', actualContextKeys);
+    console.log('actualContextValues: ', actualContextValues);
+
+    const func = new Function(...actualContextKeys, `return (${actualExpr});`);
+    return func(...actualContextValues);
+}
+
+
   
-    const updatedExpr = expr.replace(/(\b)and(\b)/gi, ' && ')
-                          .replace(/(\b)or(\b)/gi, ' || ')
-                          .replace(/(\b)gt(\b)/gi, ' > ')
-                          .replace(/(\b)lt(\b)/gi, ' < ')
-                          .replace(/(\b)ge(\b)/gi, ' >= ')
-                          .replace(/(\b)le(\b)/gi, ' =< ')
-                          .replace(/(\b)not(\b)/gi, ' ! ');
+  // evaluate(expression, context) {
 
-    console.log('updatedExpr: ', updatedExpr);
+  //   const contextKeys = Object.keys(context);
+  //   const contextValues = Object.values(context);
+  //   const expr = expression.replace(/\{(.*?)\}/g, '$1');
 
-    const func = new Function(...contextKeys, `return (${updatedExpr});`);
-    return func(...contextValues);
-  }
+  //   const updatedExpr = expr.replace(/(\b)and(\b)/gi, ' && ')
+  //     .replace(/(\b)or(\b)/gi, ' || ')
+  //     .replace(/(\b)gt(\b)/gi, ' > ')
+  //     .replace(/(\b)lt(\b)/gi, ' < ')
+  //     .replace(/(\b)ge(\b)/gi, ' >= ')
+  //     .replace(/(\b)le(\b)/gi, ' =< ')
+  //     .replace(/(\b)not(\b)/gi, ' ! ');
+
+  //   console.log('updatedExpr: ', updatedExpr);
+
+  //   // When evaluating, use the local context if it's set, otherwise use the global context
+  //   let actualContext = this.localContext || context || this.globalContext;
+
+  //   // Replace *{ with { in the expression before evaluating
+  //   // Also, remove * if it's used outside of curly braces
+  //   let actualExpr = updatedExpr.replace(/\*\{/g, '{').replace(/\*/g, '');
+
+  //   const func = new Function(...contextKeys, `return (${actualExpr});`);
+  //   return func(...contextValues);
+  // }
+
 }
 
 export default ThymeleafJs;
