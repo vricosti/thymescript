@@ -33,12 +33,18 @@ class ThymeleafJs {
   //   }
   // }
 
-  static render(html, context) {
+  static render(html, userContext) {
     const thymeleaf = new ThymeleafJs();
-    return thymeleaf.render(html, context);
+    return thymeleaf.render(html, userContext);
   }
 
-  render(html, context) {
+  render(html, userContext) {
+    
+    const context = {
+      globalContext: userContext,
+      curContexts: [],
+    };
+
     const dom = new JSDOM(`${html}`);
     const document = dom.window.document;
     this.processNode(document.body, context);
@@ -68,6 +74,17 @@ class ThymeleafJs {
   
   processNode(node, context) {
     if (node.nodeType === ELEMENT_NODE) {
+
+      let hasObjectAttr = false;
+      if (node.hasAttribute('vr:object')) {
+        let objectAttr = node.getAttributeNode('vr:object');
+        let objectValue = objectAttr.value.replace(/\{(.*?)\}/g, '$1');
+        context.curContexts.push(objectValue);
+        node.removeAttribute('vr:object');
+        hasObjectAttr = true;
+      }
+
+
       //console.log('node.nodeType: ', node.nodeType);
       for (const attr of Array.from(node.attributes)) {
         const directiveFn = this.directives[attr.name];
@@ -80,6 +97,9 @@ class ThymeleafJs {
       //console.log('node.childNodes: ', node.childNodes);
       for (const child of Array.from(node.childNodes)) {
         this.processNode(child, context);
+      }
+      if (hasObjectAttr) {
+        context.curContexts.pop();
       }
     }
   }
@@ -144,21 +164,29 @@ class ThymeleafJs {
   }
 
   evaluate(expression, context) {
-    const contextKeys = Object.keys(context);
-    const contextValues = Object.values(context);
-    const expr = expression.replace(/\{(.*?)\}/g, '$1');
-  
-    const updatedExpr = expr.replace(/(\b)and(\b)/gi, ' && ')
-                          .replace(/(\b)or(\b)/gi, ' || ')
-                          .replace(/(\b)gt(\b)/gi, ' > ')
-                          .replace(/(\b)lt(\b)/gi, ' < ')
-                          .replace(/(\b)ge(\b)/gi, ' >= ')
-                          .replace(/(\b)le(\b)/gi, ' =< ')
-                          .replace(/(\b)not(\b)/gi, ' ! ');
+    const contextKeys = Object.keys(context.globalContext);
+    const contextValues = Object.values(context.globalContext);
 
-    console.log('updatedExpr: ', updatedExpr);
+    let expr = expression.replace(/(\b)and(\b)/gi, ' && ')
+      .replace(/(\b)or(\b)/gi, ' || ')
+      .replace(/(\b)gt(\b)/gi, ' > ')
+      .replace(/(\b)lt(\b)/gi, ' < ')
+      .replace(/(\b)ge(\b)/gi, ' >= ')
+      .replace(/(\b)le(\b)/gi, ' =< ')
+      .replace(/(\b)not(\b)/gi, ' ! ');
 
-    const func = new Function(...contextKeys, `return (${updatedExpr});`);
+      console.log('context.curContexts: ', context.curContexts);
+    
+      const curContext = context.curContexts.length ? context.curContexts.join('.') : '';
+      expr = expr.replace(/(\*?){([^}]+)}/g, (match, p1, p2) => {
+        return (p1 === '*' && curContext) ? curContext + '.' + p2 : p2;
+      });
+      console.log('expr: ', expr);
+
+    console.log('contextKeys: ', contextKeys);
+    
+
+    const func = new Function(...contextKeys, `return (${expr});`);
     return func(...contextValues);
   }
 }
