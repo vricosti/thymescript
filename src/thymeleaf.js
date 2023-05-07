@@ -18,22 +18,22 @@ class ThymeleafJs {
       'vr:text': this.processText,
       'vr:attr': this.processAttr,
       'vr:class': this.processClass,
-      
+      'vr:classappend': this.processClassAppend,
     };
   }
 
-  // static createDOMParser(html) {
-  //   if (typeof window !== 'undefined' && 'DOMParser' in window) {
-  //     // Browser environment
-  //     console.log('Browser environment');
-  //     const parser = new DOMParser();
-  //     return parser.parseFromString(html, 'text/html');
-  //   } else {
-  //     // Node.js environment
-  //     console.log('Node.js environment');
-  //     return new JSDOM(html).window.document;
-  //   }
-  // }
+  static createDOMParser(html) {
+    if (typeof window !== 'undefined' && 'DOMParser' in window) {
+      // Browser environment
+      console.log('Browser environment');
+      const parser = new DOMParser();
+      return parser.parseFromString(html, 'text/html');
+    } else {
+      // Node.js environment
+      console.log('Node.js environment');
+      return new JSDOM(html).window.document;
+    }
+  }
 
   static render(html, userContext) {
     const thymeleaf = new ThymeleafJs();
@@ -48,14 +48,14 @@ class ThymeleafJs {
       objectContexts: [],
     };
 
-    const dom = new JSDOM(`${html}`);
-    const document = dom.window.document;
+    //const dom = new JSDOM(`${html}`);
+    const document = ThymeleafJs.createDOMParser(`${html}`);
     this.processNode(document.body, context);
     //return document.body.innerHTML;
   
     const hasHtmlTag = /<html[\s\S]*?>/i.test(html);
     if (hasHtmlTag) {
-      const formattedHtml = dom.serialize();
+      const formattedHtml = document.body.innerHTML;
       //const formattedHtml = prettier.format(dom.serialize(), { parser: 'html' });
       return formattedHtml;
     } else {
@@ -137,9 +137,7 @@ class ThymeleafJs {
     // We clone the current node and we remove it
     const originalClone = node.cloneNode(true);
     parent.removeChild(node);
-    //console.log(`originalClone.outerHTML:\n${originalClone.outerHTML}`);
-    //console.log(`parent.outerHTML:\n${parent.outerHTML}`);
-
+    
     for (const item of dataArray) {
       if (item === null) continue;
       
@@ -150,9 +148,6 @@ class ThymeleafJs {
       //console.log('newContext= ', newContext);
       this.processNode(clone, newContext);
     }
-   
-    //console.log(`parent.innerHTML:\n${parent.innerHTML}`);
-    //console.log(`node.innerHTML:\n${node.outerHTML}`);
   }
 
   processIf(node, attr, context) {
@@ -184,16 +179,26 @@ class ThymeleafJs {
   }
 
   processAttr(node, attr, context) {
-    const [name, expression] = attr.value.split('=');
-    const value = this.evaluate(expression, context);
-    node.setAttribute(name, value);
+    const assignments = attr.value.split(',');
+    for (const assignment of assignments) {
+      const [name, expression] = assignment.trim().split('=');
+      const value = this.evaluate(expression.trim(), context);
+      node.setAttribute(name.trim(), value);
+    }
   }
+  
 
   processClass(node, attr, context) {
     const className = this.evaluate(attr.value, context);
     node.setAttribute('class', className);
   }
 
+  processClassAppend(node, attr, context) {
+    const className = this.evaluate(attr.value, context);
+    const existingClass = node.getAttribute('class') || '';
+    node.setAttribute('class', `${existingClass} ${className}`.trim());
+  }
+  
   
 
   evaluate(expression, context) {

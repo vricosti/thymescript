@@ -4,34 +4,6 @@ import pkg from 'dom-compare';
 
 const { compare } = pkg;
 
-const ELEMENT_NODE = 1;
-const TEXT_NODE = 3;
-const COMMENT_NODE = 8;
-
-
-
-function createDOMParser() {
-  if (typeof window !== 'undefined' && 'DOMParser' in window) {
-    // Browser environment
-    //console.log('Browser environment');
-    const parser = new DOMParser();
-    return {
-      parseFromString: (html, type) => { 
-        //console.log('parseFromString: ', html);
-        return parser.parseFromString(html, type)
-      },
-    };
-  } else {
-    // Node.js environment
-    //console.log('Node.js environment');
-    return {
-      parseFromString: (html, type) => { 
-        //console.log('parseFromString: ', html);
-        return new JSDOM(html).window.document
-      },
-    };
-  }
-}
 
 function renderAndCompare(msg, templateHtml, context, expectedHtml) {
   
@@ -39,9 +11,9 @@ function renderAndCompare(msg, templateHtml, context, expectedHtml) {
 
   const renderedHtml = ThymeleafJs.render(templateHtml, context);
   console.log(renderedHtml);
-  const parser = createDOMParser();
-  const docRendered = parser.parseFromString(renderedHtml, 'text/html');
-  const docExpected = parser.parseFromString(expectedHtml, 'text/html');
+  
+  const docRendered = ThymeleafJs.createDOMParser(renderedHtml);
+  const docExpected = ThymeleafJs.createDOMParser(expectedHtml);
   const result = compare(docExpected, docRendered);
   if (result.getResult()) {
     console.log('The elements are the same.\n');
@@ -202,4 +174,39 @@ const expectedHtml04 = `
 </table>
 `;
 renderAndCompare('Example04', html04, context04, expectedHtml04);
+
+
+// Example05
+const context05 = {
+  condition: true,
+  items: [
+    { creation: "2023-04-20", requestId: "1", status: "active" },
+    { creation: "2023-04-19", requestId: "2", status: "inactive" },
+    null,
+    { creation: "2023-04-18", requestId: "3", status: "active" },
+  ]
+};
+const html05 = `
+<table class="table" vr:classappend="{condition ? 'condition-true' : ''}" style="margin-bottom: 0;">
+  <tr vr:each="item : {items}" vr:if="{item != null}" vr:attr="data-request-id={item.requestId}, data-status-id={item.status}">
+    <td vr:text="{item.creation}">DefaultValue</td>
+  </tr>
+</table>
+`;
+const expectedHtml05 = `
+<table class="table condition-true" style="margin-bottom: 0;">
+  <tbody>
+    <tr data-request-id="1" data-status-id="active">
+      <td>2023-04-20</td>
+    </tr>
+    <tr data-request-id="2" data-status-id="inactive">
+      <td>2023-04-19</td>
+    </tr>
+    <tr data-request-id="3" data-status-id="active">
+      <td>2023-04-18</td>
+    </tr>
+  </tbody>
+</table>
+`;
+renderAndCompare('Example05', html05, context05, expectedHtml05);
 
