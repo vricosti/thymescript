@@ -2,10 +2,13 @@
     "name": "thymeleafjs",
     "version": "1.0.0",
     "type": "module",
-    "description": "A template engine for JavaScript that supports the Thymeleaf syntax",
-    "main": "src/thymeleaf.js",
+    "description": "A simple template engine for JavaScript that supports the Thymeleaf syntax",
+    "main": "dist/thymeleaf.js",
     "scripts": {
-        "test": "node src/node.js"
+        "build": "webpack --config webpack.config.js && ncp dist public/dist",
+        "test": "node src/node.js",
+        "build:browser": "parcel build src/thymeleaf.browser.js --dist-dir dist && ncp dist public/dist",
+        "build:node": "parcel build src/thymeleaf.js --dist-dir dist --target node"
     },
     "keywords": [
         "thymeleaf",
@@ -21,6 +24,12 @@
         "prettier": "^2.8.8"
     },
     "devDependencies": {
-        "jest": "^27.4.7"
+        "@babel/cli": "^7.21.5",
+        "@babel/core": "^7.21.8",
+        "@babel/preset-env": "^7.21.5",
+        "babel-loader": "^9.1.2",
+        "jest": "^27.4.7",
+        "ncp": "^2.0.0",
+        "webpack-cli": "^5.1.0"
     }
 }
