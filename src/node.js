@@ -91,6 +91,7 @@ const html01 = `
 <html>
   <head></head>
   <body>
+    <p vr:text="'Simple Text'"></p>
     <p vr:text="'Simple Text: ' + {message}">DefaultValue</p>
     <p vr:text="'Escaped Text: ' + {messageWelcome}">DefaultValue</p>
     <p vr:utext="'Unescaped Text: ' + {messageWelcome}">DefaultValue</p>
@@ -115,6 +116,7 @@ const expectedHtml01 = `
 <html>
   <head></head>
   <body>
+    <p>Simple Text</p>
     <p>Simple Text: ChatGPT is amazing!</p>
     <p>Escaped Text: Welcome to our &lt;b&gt;fantastic&lt;/b&gt; grocery store!</p>
     <p>Unescaped Text: Welcome to our <b>fantastic</b> grocery store!</p>
@@ -170,33 +172,34 @@ renderAndCompare('Example03', html03, context03, expectedHtml03);
 
 // Example04
 const context04 = {
-  anObject: [
+  items: [
     { creation: "2023-04-20", requestId: "1", status: "active" },
     { creation: "2023-04-19", requestId: "2", status: "inactive" },
     null,
     { creation: "2023-04-18", requestId: "3", status: "active" },
   ]
 };
-// const html04 = `
-// <table class="table" style="margin-bottom: 0;">
-//   <tr vr:each="value : {anObject}" vr:if="{value != null}" data-request-id="{value.requestId}" data-status-id="{value.status}">
-//     <td vr:text="{value.creation}">DefaultValue</td>
-//   </tr>
-// </table>
-// `;
-// const modifiedHtml04 = ThymeleafJs.render(html04, context04);
-// console.log(modifiedHtml04);
+const html04 = `
+<table class="table" style="margin-bottom: 0;">
+  <tr vr:each="item : {items}" vr:if="{item != null}" vr:data-request-id="{item.requestId}" vr:data-status-id="{item.status}">
+    <td vr:text="{item.creation}">DefaultValue</td>
+  </tr>
+</table>
+`;
+const expectedHtml04 = `
+<table class="table" style="margin-bottom: 0;">
+  <tbody>
+    <tr data-request-id="1" data-status-id="active">
+      <td>2023-04-20</td>
+    </tr>
+    <tr data-request-id="2" data-status-id="inactive">
+      <td>2023-04-19</td>
+    </tr>
+    <tr data-request-id="3" data-status-id="active">
+      <td>2023-04-18</td>
+    </tr>
+  </tbody>
+</table>
+`;
+renderAndCompare('Example04', html04, context04, expectedHtml04);
 
-// const expectedHtml04 = `
-// <table class="table" style="margin-bottom: 0;">
-//   <tr data-request-id="1" data-status-id="active">
-//     <td>2023-04-20</td>
-//   </tr>
-//   <tr data-request-id="2" data-status-id="inactive">
-//     <td>2023-04-19</td>
-//   </tr>
-//   <tr data-request-id="3" data-status-id="active">
-//     <td>2023-04-18</td>
-//   </tr>
-// </table>
-// `;
