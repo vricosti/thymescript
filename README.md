@@ -1,74 +1,43 @@
-# ThymeleafJS
+# ThymeleafJS 
 
-ThymeleafJS is a template engine for JavaScript that supports the Thymeleaf syntax. It can be used both in the browser and in Node.js.
+ThymeleafJs is a powerful and flexible JavaScript library for client-side HTML template rendering, inspired by Thymeleaf. 
+It can be used both in the browser and in Node.js.
+This library is perfect for those who are looking for a simple (8kB) yet powerful way to manipulate and render HTML templates using JavaScript.  
+ThymeleafJs was generated with the help of ChatGPT, an AI language model by OpenAI (and its servitor to guide it).
 
-## Usage
+## Features
 
-### Installation
+- Client-side rendering support
+- Easy-to-use syntax inspired by Thymeleaf
+- Conditional rendering and iteration support
+- Customizable attribute expressions and processing
+- Seamless integration with popular JavaScript frameworks
 
-You can install ThymeleafJS using npm:
+## Installation
 
-```bash
-npm install thymeleafjs
+For the moment there is no npm package, you have to build the library and copy it inside your project:  
 
+`npm run build:prod`
 
-const ThymeleafJs = require('thymeleafjs');
+## Usage  
 
-const thymeleaf = new ThymeleafJs();
+### 1. Include ThymeleafJs in your HTML file
 
-const html = `
-  <html>
-    <head></head>
-    <body>
-      <p th:text="@{message}">DefaultValue</p>
-    </body>
-  </html>
-`;
-
-const context = { message: 'ChatGPT is amazing!' };
-const modifiedHtml = thymeleaf.render(html, context);
-console.log(modifiedHtml);
-
-ThymeleafJS Attributes
-ThymeleafJS supports the following ThymeleafJS attributes:
-
-th:if="@{condition-to-evaluate}": Used to test a condition and is the most prioritary attribute.
-th:text="@{text}": Used to set the text of a tag.
-th:attr="attribute=...": Used to set an attribute (most common use is with class attribute).
-th:class="@{class}": Used to set the class attribute of a tag.
-th:each="varName:@{data}": Used to repeat some tags and is evaluated as data.forEach(function (varName) { }).
-Differences from Thymeleaf
-To avoid conflicts when using string interpolation in JavaScript, ThymeleafJS uses @ instead of $ before braces. For example, th:text="$\{message}" in Thymeleaf should be written as th:text="@{message}" in ThymeleafJS.
-
-Also, ThymeleafJS uses th:class for setting the class attribute of a tag, instead of th:classappend in Thymeleaf.
-
-Examples
-Example 1
-javascript
-Copy code
-const ThymeleafJs = require('thymeleafjs');
-
-const thymeleaf = new ThymeleafJs();
-
-const html = `
-  <html>
-    <head></head>
-    <body>
-      <p th:text="@{message}">DefaultValue</p>
-    </body>
-  </html>
-`;
-
-const context = { message: 'ChatGPT is amazing!' };
-const modifiedHtml = thymeleaf.render(html, context);
-console.log(modifiedHtml);
-Output:
-
-php
-Copy code
-<html>
-  <head></head>
-  <body>
-    <p>ChatGPT is amazing!</p>
-  </body>
+``` html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ThymeleafJs Example</title>
+    <script src="dist/thymeleaf.min.js"></script>
+</head>
+<body>
+    <!-- Your HTML code goes here -->
+</body>
 </html>
+```
+
+
+
+
+
