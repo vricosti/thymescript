@@ -10,7 +10,7 @@
 // CommonJS
 const path = require('path');
 const nodeExternals = require('webpack-node-externals');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+//const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 /*
 const nodeConfig = {
@@ -46,9 +46,9 @@ const generalConfig = {
     ignored: /node_modules/,
   },
   plugins: [
-    new HtmlWebpackPlugin({
-      name:"HtmlWebpackPlugin"
-    })
+    // new HtmlWebpackPlugin({
+    //   name:"HtmlWebpackPlugin"
+    // })
   ],
   devServer: {
     hot: 'only',

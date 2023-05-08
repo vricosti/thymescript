@@ -13,6 +13,23 @@ ThymeleafJs was generated with the help of ChatGPT, an AI language model by Open
 - Customizable attribute expressions and processing
 - Seamless integration with popular JavaScript frameworks
 
+## Differences with server-side Thymeleaf (Java)  
+
+- Since we are inside the browser we use the `th:{varName}` instead of `th:${varName}`.
+
+Following attributes are not implemented (yet):  
+
+- th:block is not yet implemented 
+- th:var
+- th:href, th:src, th:action
+- th:include, th:replace, th:insert, th:fragment
+- th:attrprepend
+- th:attrappend
+- th:switch, th:case
+- th:style
+- th:field, th:label, th:option, th:optgroup, th:errorclass, th:errors
+- th:inline, th:remove, th:assert, th:alias, th:data
+
 ## Installation
 
 For the moment there is no npm package, you have to build the library and copy it inside your project:  
@@ -90,6 +107,18 @@ This will render the following HTML:
 </div>
 ```
 
+
+## Run example  
+
+`npm run serve`
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request on GitHub.
+
+## License  
+
+hymeleafJs is released under the MIT License. See the LICENSE file for more information.
 
 
 
