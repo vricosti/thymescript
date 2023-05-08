@@ -1,9 +1,8 @@
 # ThymeleafJS 
 
 ThymeleafJs is a powerful and flexible JavaScript library for client-side HTML template rendering, inspired by Thymeleaf. 
-It can be used both in the browser and in Node.js.
 This library is perfect for those who are looking for a simple (8kB) yet powerful way to manipulate and render HTML templates using JavaScript.  
-ThymeleafJs was generated with the help of ChatGPT, an AI language model by OpenAI (and its servitor to guide it).
+<ins>**ThymeleafJs was generated with the help of ChatGPT (OpenAI), and its servitor to guide it.**<ins>
 
 ## Features
 
@@ -15,7 +14,7 @@ ThymeleafJs was generated with the help of ChatGPT, an AI language model by Open
 
 ## Differences with server-side Thymeleaf (Java)  
 
-- Since we are inside the browser we use the `th:{varName}` instead of `th:${varName}`.
+- Since we are inside the browser and to be able to use Template string we use the `th:{varName}` instead of `th:${varName}`.
 
 Following attributes are not implemented (yet):  
 
@@ -24,9 +23,9 @@ Following attributes are not implemented (yet):
 - th:href, th:src, th:action
 - th:include, th:replace, th:insert, th:fragment
 - th:switch, th:case
-- th:style
 - th:field, th:label, th:option, th:optgroup, th:errorclass, th:errors
 - th:inline, th:remove, th:assert, th:alias, th:data
+- ...  
 
 ## Installation
 
