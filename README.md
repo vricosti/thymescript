@@ -30,11 +30,64 @@ For the moment there is no npm package, you have to build the library and copy i
     <meta charset="UTF-8">
     <title>ThymeleafJs Example</title>
     <script src="dist/thymeleaf.min.js"></script>
+    <script id="template">...SEE BELOW...</script>
 </head>
 <body>
-    <!-- Your HTML code goes here -->
+  <div id="app">
+    <!-- !! The ThymeleafJs output will be inserted here !! -->
+  </div>
 </body>
 </html>
+```
+
+### 2. Create an HTML template with ThymeleafJs attributes
+
+``` html
+<script id="template">
+    document.addEventListener('DOMContentLoaded', () => {
+      
+      const template = `
+        <div vr:object="{user}">
+          <h1>Welcome, <span vr:text="*{name}"></span>!</h1>
+          <p>Your email address is: <span vr:text="*{email}"></span></p>
+          <p>Your friends:</p>
+          <ul>
+              <li vr:each="friend : *{friends}">
+                  <span vr:text="{friend.name}">Friend's Name</span>
+              </li>
+          </ul>
+        </div>
+        `;
+
+      const context = {
+          user: {
+              name: 'John Doe',
+              email: 'john.doe@example.com',
+              friends: [
+                  { name: 'Alice' },
+                  { name: 'Bob' }
+              ]
+          }
+      };
+      
+      const output = ThymeleafJs.render(template, context);
+      document.getElementById('app').innerHTML = output;
+    });
+  </script>
+```
+
+This will render the following HTML:  
+
+``` html
+<div>
+    <h1>Welcome, John Doe!</h1>
+    <p>Your email address is: john.doe@example.com</p>
+    <p>Your friends:</p>
+    <ul>
+        <li>Alice</li>
+        <li>Bob</li>
+    </ul>
+</div>
 ```
 
 

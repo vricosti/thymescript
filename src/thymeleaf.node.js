@@ -1,20 +1,24 @@
-const ELEMENT_NODE = 1;
-const TEXT_NODE = 3;
+import { JSDOM } from 'jsdom';
+import prettier from 'prettier';
+
+  // Declare constants inside the class
+  const ELEMENT_NODE = 1;
+  const TEXT_NODE = 3;
 
 class ThymeleafJs {
 
 
   constructor() {
     this.directives = {
-      'vr:each': this.processEach,
-      'vr:if': this.processIf,
-      //'vr:object': this.processObject,
-      'vr:unless': this.processUnless,
-      'vr:utext': this.processUText,
-      'vr:text': this.processText,
-      'vr:attr': this.processAttr,
-      'vr:class': this.processClass,
-      'vr:classappend': this.processClassAppend,
+      'th:each': this.processEach,
+      'th:if': this.processIf,
+      //'th:object': this.processObject,
+      'th:unless': this.processUnless,
+      'th:utext': this.processUText,
+      'th:text': this.processText,
+      'th:attr': this.processAttr,
+      'th:class': this.processClass,
+      'th:classappend': this.processClassAppend,
     };
   }
 
@@ -75,24 +79,24 @@ class ThymeleafJs {
     if (node.nodeType === ELEMENT_NODE) {
       
       let hasObjectAttr = false;
-      if (node.hasAttribute('vr:object')) {
-        let objectAttr = node.getAttributeNode('vr:object');
+      if (node.hasAttribute('th:object')) {
+        let objectAttr = node.getAttributeNode('th:object');
         let objectValue = objectAttr.value.replace(/\{(.*?)\}/g, '$1');
         context.objectContexts.push(objectValue);
-        node.removeAttribute('vr:object');
+        node.removeAttribute('th:object');
         hasObjectAttr = true;
       }
 
 
       //console.log('node.nodeType: ', node.nodeType);
-      const regex = /vr:([\w-]+)/;
+      const regex = /th:([\w-]+)/;
       for (const attr of Array.from(node.attributes)) {
-        if (attr.name.startsWith("vr:")) {
+        if (attr.name.startsWith("th:")) {
           const directiveFn = this.directives[attr.name];
           if (directiveFn) {
             context.attrName = attr.name;
             directiveFn.call(this, node, attr, context);
-            if (attr.name === 'vr:each') {
+            if (attr.name === 'th:each') {
               return;
             }
             node.removeAttribute(attr.name);
@@ -114,7 +118,7 @@ class ThymeleafJs {
 
   processExternalAttr(node, attr, context) {
 
-    // handle all external tags starting with vr:  
+    // handle all external tags starting with th:  
     const attrName = attr.name.slice(3);
     const attrValue = this.evaluate(attr.value, context);
     node.removeAttribute(attr.name);
@@ -195,6 +199,8 @@ class ThymeleafJs {
     node.setAttribute('class', `${existingClass} ${className}`.trim());
   }
   
+  
+
   evaluate(expression, context) {
     const contextKeys = Object.keys(context.globalContext);
     const contextValues = Object.values(context.globalContext);
@@ -225,6 +231,4 @@ class ThymeleafJs {
   }
 }
 
-// Export ThymeleafJs as a global variable
-//window.ThymeleafJs = ThymeleafJs;
 export default ThymeleafJs;

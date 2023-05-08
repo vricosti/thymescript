@@ -1,9 +1,11 @@
-import ThymeleafJs from './thymeleaf.js';
-import { JSDOM } from 'jsdom';
+import ThymeleafJs from '../src/thymeleaf.node.js';
 import pkg from 'dom-compare';
 
 const { compare } = pkg;
 
+////////////////////
+// TO TEST AND DEBUG: temporary add type": "module" inside package.json and npm run test:node
+////////////////////
 
 function renderAndCompare(msg, templateHtml, context, expectedHtml) {
   
@@ -40,19 +42,19 @@ const context01 = {
   friends: {
     'Leonardo DiCaprio': { 
       age: 47, 
-      email: 'leo.dicaprio@gmail.com' 
+      email: 'leo.dicaprio123@gmail.com' 
     },
     'Meryl Streep': { 
       age: 72, 
-      email: 'meryl.streep@yahoo.com' 
+      email: 'meryl.streep456@yahoo.com' 
     },
     'Tom Hanks': { 
       age: 65, 
-      email: 'tom.hanks@hotmail.com',
+      email: 'tom.hanks789@hotmail.com',
       children: {
         'Colin Hanks': {
           age: 45, 
-          email: 'colin.hanks@hotmail.com',
+          email: 'colin.hanks253@hotmail.com',
         }
       }
     }
@@ -63,23 +65,23 @@ const html01 = `
 <html>
   <head></head>
   <body>
-    <p vr:text="'Simple Text'"></p>
-    <p vr:text="'Simple Text: ' + {message}">DefaultValue</p>
-    <p vr:text="'Escaped Text: ' + {messageWelcome}">DefaultValue</p>
-    <p vr:utext="'Unescaped Text: ' + {messageWelcome}">DefaultValue</p>
-    <p vr:text="{message}">DefaultValue</p>
-    <p vr:text="{teacher.active} ? 'ACTIVE' : 'RETIRED'"></p>
-    <p vr:text="{teacher.active ? 'ACTIVE' : 'RETIRED'}"></p>
-    <p vr:text="{teacher.subject == 'Mathematics' ? 'You like mathematics' : 'You dont like mathematics'}"></p>
-    <p vr:if="{teacher.gender == 'M'}">Male</p>
-    <p vr:unless="{teacher.gender == 'M'}">Female</p>
-    <p vr:if="{teacher.age &gt; 29 and teacher.age &lt; 49}">Middle age</p>
-    <p vr:if="{teacher.age gt  29 and teacher.age lt 49}">Middle age</p>
-    <div vr:object="{friends['Tom Hanks']}" class="box">
-      <p><b>Tom Hanks's:</b> <span vr:utext="'age: '+ *{age} + ' email: ' + *{email}"></span></p>
-      <p><b>Tom Hanks's age:</b> <span vr:utext="*{age}"></span></p>
-      <p vr:object="{children['Colin Hanks']}"><b>Colin Hanks's age:</b> <span vr:utext="*{age}"></span></p>
-      <p><b>Author's age:</b> <span vr:utext="{age}"></span></p>
+    <p th:text="'Simple Text'"></p>
+    <p th:text="'Simple Text: ' + {message}">DefaultValue</p>
+    <p th:text="'Escaped Text: ' + {messageWelcome}">DefaultValue</p>
+    <p th:utext="'Unescaped Text: ' + {messageWelcome}">DefaultValue</p>
+    <p th:text="{message}">DefaultValue</p>
+    <p th:text="{teacher.active} ? 'ACTIVE' : 'RETIRED'"></p>
+    <p th:text="{teacher.active ? 'ACTIVE' : 'RETIRED'}"></p>
+    <p th:text="{teacher.subject == 'Mathematics' ? 'You like mathematics' : 'You dont like mathematics'}"></p>
+    <p th:if="{teacher.gender == 'M'}">Male</p>
+    <p th:unless="{teacher.gender == 'M'}">Female</p>
+    <p th:if="{teacher.age &gt; 29 and teacher.age &lt; 49}">Middle age</p>
+    <p th:if="{teacher.age gt  29 and teacher.age lt 49}">Middle age</p>
+    <div th:object="{friends['Tom Hanks']}" class="box">
+      <p><b>Tom Hanks's:</b> <span th:utext="'age: '+ *{age} + ' email: ' + *{email}"></span></p>
+      <p><b>Tom Hanks's age:</b> <span th:utext="*{age}"></span></p>
+      <p th:object="{children['Colin Hanks']}"><b>Colin Hanks's age:</b> <span th:utext="*{age}"></span></p>
+      <p><b>Author's age:</b> <span th:utext="{age}"></span></p>
     </div>
   </body>
 </html>
@@ -100,7 +102,7 @@ const expectedHtml01 = `
     <p>Middle age</p>
     <p>Middle age</p>
     <div class="box">
-      <p><b>Tom Hanks's:</b> <span>age: 65 email: tom.hanks@hotmail.com</span></p>
+      <p><b>Tom Hanks's:</b> <span>age: 65 email: tom.hanks789@hotmail.com</span></p>
       <p><b>Tom Hanks's age:</b> <span>65</span></p>
       <p><b>Colin Hanks's age:</b> <span>45</span></p>
       <p><b>Author's age:</b> <span>45</span></p>
@@ -114,10 +116,10 @@ renderAndCompare('Example01', html01, context01, expectedHtml01);
 // Example02
 const context02 = { condition: false };
 const html02 = `
-<span vr:if="{condition}" class="base condition-true">
+<span th:if="{condition}" class="base condition-true">
   This HTML is duplicated. We probably want a better solution.
 </span>
-<span vr:if="{!condition}" class="base condition-false">
+<span th:if="{!condition}" class="base condition-false">
   This HTML is duplicated. We probably want a better solution.
 </span>
 `;
@@ -131,7 +133,7 @@ renderAndCompare('Example02', html02, context02, expectedHtml02);
 // Example03
 const context03 = { condition: true };
 const html03 = `
-<span vr:attr="class={condition ? 'base condition-true' : 'base condition-false'}">
+<span th:attr="class={condition ? 'base condition-true' : 'base condition-false'}">
    This HTML is consolidated, which is good, but the Thymeleaf attribute still has some redundancy in it.
 </span>
 `;
@@ -153,8 +155,8 @@ const context04 = {
 };
 const html04 = `
 <table class="table" style="margin-bottom: 0;">
-  <tr vr:each="item : {items}" vr:if="{item != null}" vr:data-request-id="{item.requestId}" vr:data-status-id="{item.status}">
-    <td vr:text="{item.creation}">DefaultValue</td>
+  <tr th:each="item : {items}" th:if="{item != null}" th:data-request-id="{item.requestId}" th:data-status-id="{item.status}">
+    <td th:text="{item.creation}">DefaultValue</td>
   </tr>
 </table>
 `;
@@ -187,9 +189,9 @@ const context05 = {
   ]
 };
 const html05 = `
-<table class="table" vr:classappend="{condition ? 'condition-true' : ''}" style="margin-bottom: 0;">
-  <tr vr:each="item : {items}" vr:if="{item != null}" vr:attr="data-request-id={item.requestId}, data-status-id={item.status}">
-    <td vr:text="{item.creation}">DefaultValue</td>
+<table class="table" th:classappend="{condition ? 'condition-true' : ''}" style="margin-bottom: 0;">
+  <tr th:each="item : {items}" th:if="{item != null}" th:attr="data-request-id={item.requestId}, data-status-id={item.status}">
+    <td th:text="{item.creation}">DefaultValue</td>
   </tr>
 </table>
 `;

@@ -35,38 +35,41 @@
       `;
 
       const context = {
-        name: 'Vince Ricosti',
-        age: 45,
-        message: 'ChatGPT is amazing!',
-        messageWelcome: 'Welcome to our <b>fantastic</b> grocery store!',
-        teacher: {
-          "name": "John Smith",
-          "gender": "M",
-          "age": 35,
-          "subject": "Mathematics",
-          "active": true,
+      name: 'Vince Ricosti',
+      age: 45,
+      message: 'ChatGPT is amazing!',
+      messageWelcome: 'Welcome to our <b>fantastic</b> grocery store!',
+      teacher: {
+        "name": "John Smith",
+        "gender": "M",
+        "age": 35,
+        "subject": "Mathematics",
+        "active": true,
+      },
+      friends: {
+        'Leonardo DiCaprio': { 
+          age: 47, 
+          email: 'leo.dicaprio123@gmail.com' 
         },
-        friends: {
-          'Leonardo DiCaprio': { 
-            age: 47, 
-            email: 'leo.dicaprio123@gmail.com' 
-          },
-          'Meryl Streep': { 
-            age: 72, 
-            email: 'meryl.streep456@yahoo.com' 
-          },
-          'Tom Hanks': { 
-            age: 65, 
-            email: 'tom.hanks789@hotmail.com',
-            children: {
-              'Colin Hanks': {
-                age: 45, 
-                email: 'colin.hanks253@hotmail.com',
-              }
+        'Meryl Streep': { 
+          age: 72, 
+          email: 'meryl.streep456@yahoo.com' 
+        },
+        'Tom Hanks': { 
+          age: 65, 
+          email: 'tom.hanks789@hotmail.com',
+          children: {
+            'Colin Hanks': {
+              age: 45, 
+              email: 'colin.hanks253@hotmail.com',
             }
           }
-        },
-      };
+        }
+      },
+  };
+
+
+      console.log(ThymeleafJs);
       const output = ThymeleafJs.render(template, context);
       document.getElementById('app').innerHTML = output;
     });
