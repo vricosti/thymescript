@@ -59,6 +59,7 @@ const context01 = {
       }
     }
   },
+  cssStyle: 'warning'
 };
 
 const html01 = `
@@ -83,6 +84,7 @@ const html01 = `
       <p th:object="{children['Colin Hanks']}"><b>Colin Hanks's age:</b> <span th:utext="*{age}"></span></p>
       <p><b>Author's age:</b> <span th:utext="{age}"></span></p>
     </div>
+    <input type="button" value="Do it!" class="btn" th:attrappend="class={' ' + cssStyle}" />
   </body>
 </html>
 `;
@@ -107,6 +109,7 @@ const expectedHtml01 = `
       <p><b>Colin Hanks's age:</b> <span>45</span></p>
       <p><b>Author's age:</b> <span>45</span></p>
     </div>
+    <input type="button" value="Do it!" class="btn warning" />
   </body>
 </html>
 `;

@@ -13,8 +13,11 @@ class ThymeleafJs {
       'th:utext': this.processUText,
       'th:text': this.processText,
       'th:attr': this.processAttr,
+      'th:attrappend': this.processAttrAppend,
+      'th:attrprepend': this.processAttrPrepend,
       'th:class': this.processClass,
       'th:classappend': this.processClassAppend,
+      'th:styleappend': this.processStyleAppend,
     };
   }
 
@@ -180,6 +183,25 @@ class ThymeleafJs {
     }
   }
   
+  processAttrAppend(node, attr, context) {
+    const assignments = attr.value.split(',');
+    for (const assignment of assignments) {
+      const [name, expression] = assignment.trim().split('=');
+      const value = this.evaluate(expression.trim(), context);
+      const existingValue = node.getAttribute(name.trim()) || '';
+      node.setAttribute(name.trim(), `${existingValue} ${value}`.trim());
+    }
+  }
+  
+  processAttrPrepend(node, attr, context) {
+    const assignments = attr.value.split(',');
+    for (const assignment of assignments) {
+      const [name, expression] = assignment.trim().split('=');
+      const value = this.evaluate(expression.trim(), context);
+      const existingValue = node.getAttribute(name.trim()) || '';
+      node.setAttribute(name.trim(), `${value} ${existingValue}`.trim());
+    }
+  }
 
   processClass(node, attr, context) {
     const className = this.evaluate(attr.value, context);
@@ -190,6 +212,12 @@ class ThymeleafJs {
     const className = this.evaluate(attr.value, context);
     const existingClass = node.getAttribute('class') || '';
     node.setAttribute('class', `${existingClass} ${className}`.trim());
+  }
+
+  processStyleAppend(node, attr, context) {
+    const styleValue = this.evaluate(attr.value, context);
+    const existingStyle = node.getAttribute('style') || '';
+    node.setAttribute('style', `${existingStyle}; ${styleValue}`.trim());
   }
   
   evaluate(expression, context) {

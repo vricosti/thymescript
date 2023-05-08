@@ -23,8 +23,6 @@ Following attributes are not implemented (yet):
 - th:var
 - th:href, th:src, th:action
 - th:include, th:replace, th:insert, th:fragment
-- th:attrprepend
-- th:attrappend
 - th:switch, th:case
 - th:style
 - th:field, th:label, th:option, th:optgroup, th:errorclass, th:errors
