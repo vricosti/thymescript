@@ -1,5 +1,6 @@
 {
     "name": "thymeleafjs",
+    "type": "module",
     "version": "1.0.0",
     "description": "A simple template engine for JavaScript that supports the Thymeleaf syntax",
     "main": "dist/thymeleaf.js",

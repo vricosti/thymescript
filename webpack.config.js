@@ -1,30 +1,26 @@
-/*
-  // When using ES modules
-  import path from 'path';
-  import { fileURLToPath } from 'url';
-  import nodeExternals from 'webpack-node-externals'
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-*/
+// ES6 Modules
+import path from 'path';
+import nodeExternals from 'webpack-node-externals';
+import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
-// CommonJS
-const path = require('path');
-const nodeExternals = require('webpack-node-externals');
-//const HtmlWebpackPlugin = require('html-webpack-plugin');
+const require = createRequire(import.meta.url);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-/*
-const nodeConfig = {
-  entry: './src/thymeleaf.node.js',
-  target: 'node',
-  externals: [nodeExternals()],
-  output: {
-    path: path.resolve(__dirname, './dist'),
-    filename: 'thymeleaf.node.js',
-    libraryTarget: 'umd',
-    libraryExport: 'default',
-  },
-};
-*/
+
+// const nodeConfig = {
+//   entry: './src/thymeleaf.node.js',
+//   target: 'node',
+//   externals: [nodeExternals()],
+//   output: {
+//     path: path.resolve(__dirname, './dist'),
+//     filename: 'thymeleaf.node.js',
+//     libraryTarget: 'umd',
+//     libraryExport: 'default',
+//   },
+// };
+
 
 const browserConfig = {
   entry: './src/thymeleaf.js',
@@ -46,37 +42,13 @@ const generalConfig = {
     ignored: /node_modules/,
   },
   plugins: [
-    // new HtmlWebpackPlugin({
-    //   name:"HtmlWebpackPlugin"
-    // })
   ],
   devServer: {
     hot: 'only',
     static: {
       directory: path.resolve(__dirname, "public"),
-      // staticOptions: {},
-      // // Don't be confused with `devMiddleware.publicPath`, it is `publicPath` for static directory
-      // // Can be:
-      // // publicPath: ['/static-public-path-one/', '/static-public-path-two/'],
-      // publicPath: "/static-public-path/",
-      // // Can be:
-      // // serveIndex: {} (options for the `serveIndex` option you can find https://github.com/expressjs/serve-index)
-      // serveIndex: true,
-      // // Can be:
-      // // watch: {} (options for the `watch` option you can find https://github.com/paulmillr/chokidar)
-      //watch: true,
     },
   },
-  // devServer: {
-  //   contentBase: path.join(__dirname, './public'),
-  //   // CORS
-  //   headers: {
-  //     "Access-Control-Allow-Origin": "*",
-  //     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-  //     "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
-  //   },
-  //   hot:true,
-  // },
   module: {
     rules: [
       {
@@ -93,7 +65,7 @@ const generalConfig = {
   },
 };
 
-module.exports = (env, argv) => {
+export default (env, argv) => {
   if (argv.mode === 'development') {
     generalConfig.devtool = 'cheap-module-source-map';
   } else if (argv.mode === 'production') {
@@ -103,6 +75,7 @@ module.exports = (env, argv) => {
 
   //Object.assign(nodeConfig, generalConfig);
   Object.assign(browserConfig, generalConfig);
+  //return [nodeConfig, browserConfig];
 
   return [browserConfig];
 };
