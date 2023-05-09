@@ -20,7 +20,6 @@ import prettier from 'prettier';
         'th:attr': this.processAttr,
         'th:attrappend': this.processAttrAppend,
         'th:attrprepend': this.processAttrPrepend,
-        'th:class': this.processClass,
         'th:classappend': this.processClassAppend,
         'th:styleappend': this.processStyleAppend,
       };
@@ -103,7 +102,7 @@ import prettier from 'prettier';
               }
               node.removeAttribute(attr.name);
             } else {
-              this.processExternalAttr(node, attr, context);
+              this.processStandardAttr(node, attr, context);
             }
           }
         }
@@ -118,7 +117,7 @@ import prettier from 'prettier';
       }
     }
   
-    processExternalAttr(node, attr, context) {
+    processStandardAttr(node, attr, context) {
   
       // handle all external tags starting with th:  
       const attrName = attr.name.slice(3);
@@ -207,12 +206,7 @@ import prettier from 'prettier';
         node.setAttribute(name.trim(), `${value} ${existingValue}`.trim());
       }
     }
-  
-    processClass(node, attr, context) {
-      const className = this.evaluate(attr.value, context);
-      node.setAttribute('class', className);
-    }
-  
+    
     processClassAppend(node, attr, context) {
       const className = this.evaluate(attr.value, context);
       const existingClass = node.getAttribute('class') || '';

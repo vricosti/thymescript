@@ -15,7 +15,6 @@ const TEXT_NODE = 3;
         'th:attr': this.processAttr,
         'th:attrappend': this.processAttrAppend,
         'th:attrprepend': this.processAttrPrepend,
-        'th:class': this.processClass,
         'th:classappend': this.processClassAppend,
         'th:styleappend': this.processStyleAppend,
       };
@@ -98,7 +97,7 @@ const TEXT_NODE = 3;
               }
               node.removeAttribute(attr.name);
             } else {
-              this.processExternalAttr(node, attr, context);
+              this.processStandardAttr(node, attr, context);
             }
           }
         }
@@ -113,7 +112,7 @@ const TEXT_NODE = 3;
       }
     }
   
-    processExternalAttr(node, attr, context) {
+    processStandardAttr(node, attr, context) {
   
       // handle all external tags starting with th:  
       const attrName = attr.name.slice(3);
@@ -202,12 +201,7 @@ const TEXT_NODE = 3;
         node.setAttribute(name.trim(), `${value} ${existingValue}`.trim());
       }
     }
-  
-    processClass(node, attr, context) {
-      const className = this.evaluate(attr.value, context);
-      node.setAttribute('class', className);
-    }
-  
+    
     processClassAppend(node, attr, context) {
       const className = this.evaluate(attr.value, context);
       const existingClass = node.getAttribute('class') || '';
