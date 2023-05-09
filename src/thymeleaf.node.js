@@ -242,15 +242,44 @@ import prettier from 'prettier';
         // if there is an array of objectContexts ex [friends['Tom Hanks'], children['Colin Hanks']]
         // We build the full context path: friends['Tom Hanks'].children['Colin Hanks']
         const curContext = context.objectContexts.length ? context.objectContexts.join('.') : '';
+        
+        
+        // You really think I could write this, of course not, ChatGPT powered
+        // Maybe rewrite with a manual parsing easier to maintain and understand
+        const variables = new Set();
+        const expressionRegex = /{([^}]+)}/g;
+        const variableRegex = /(?:^|[^\w'"])([\w_][\w\d_]*)(?:\s*[^\w\s\d'"]*\s*[\w\d_]*|[^\w'"]|$)/g;
+        const quotedWordRegex = /(["'])(?:(?=(\\?))\2.)*?\1/g;
+        const numberRegex = /\b\d+\b/g;
+
+        let expressionMatch;
+        while ((expressionMatch = expressionRegex.exec(expr)) !== null) {
+          const expression = expressionMatch[1]
+            .replace(quotedWordRegex, '')
+            .replace(numberRegex, '');
+          let variableMatch;
+          while ((variableMatch = variableRegex.exec(expression)) !== null) {
+            variables.add(variableMatch[1]);
+          }
+        }
+
+        //console.log('expr: ', expr);
+        //console.log('variables: ', variables);
+
         expr = expr.replace(/(\*?){([^}]+)}/g, (match, p1, p2) => {
           return (p1 === '*' && curContext) ? curContext + '.' + p2 : p2;
         });
-        //console.log('expr: ', expr);
-  
+
+        let undefinedValuesExpr = '';
+        for (const variable of variables) {
+          if (!contextKeys.includes(variable)) {
+            const undefinedVal = (context.attrName === 'th:text' || context.attrName === 'th:utext') ? "''" : 'undefined';
+            undefinedValuesExpr += `var ${variable} = ${undefinedVal};`;
+          }
+        }
+
       //console.log('contextKeys: ', contextKeys);
-      
-  
-      const func = new Function(...contextKeys, `return (${expr});`);
+      const func = new Function(...contextKeys, `${undefinedValuesExpr} return (${expr});`);
       return func(...contextValues);
     }
   }
