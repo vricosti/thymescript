@@ -219,58 +219,58 @@ const expectedHtml05 = `
 renderAndCompare('Example05', html05, context05, expectedHtml05);
 
 
-// const context06 = {
-//   requestId:1367,
-//   creation:"2022-11-23 11:01:35",
-//   name:"getLoanSimulation:957",
-//   status:"finished_error",
-//   url:"/case/rest/testthymleafjs/36363/1367",
-//   displayBtn: true,
-//   btnText: "Replay"
-// };
-// const html06 = `
-// <tr th:data-request-id="{requestId}" th:data-status-id="{status}">
-//   <td th:text="{creation}"></td>
-//   <td th:text="{name}"></td>
-//   <td>
-//       <a th:if="{url}" th:href="{url}">
-//           <i class="fas fa-file-download fa-2x" style="color: #A7A8AA"></i>
-//       </a>
-//   </td>
-//   <td>
-//       <strong th:text="{status}"></strong> : <span th:text="{errorMessage}"></span>
-//   </td>
-//   <td>
-//       <div th:id="'divButton-WsRequest_' + {requestId}">
-//           <a th:if="{displayBtn and (status == 'finished_error' or status == 'finished_timeout')}"
-//               class="btn tul-blue-malibu" style="display: inline; margin: 0.5em;border-radius: 2em;"
-//               th:id="'WSREQUEST_' + {requestId} + '_button'"
-//               th:text="{btnText}">
-//           </a>
-//       </div>
-//   </td>
-// </tr>
-// `;
-// const expectedHtml06 = `
-// <tr data-request-id="1367" data-status-id="finished_error">
-//   <td th:text="2022-11-23 11:01:35">2022-11-23 11:01:35</td>
-//   <td th:text="getLoanSimulation:957">getLoanSimulation:957</td>
-//   <td>
-//     <a th:href="/case/rest/testthymleafjs/36363/1367">
-//       <i class="fas fa-file-download fa-2x" style="color: #A7A8AA"></i>
-//     </a>
-//   </td>
-//   <td>
-//     <strong>finished_error</strong> : <span></span>
-//   </td>
-//   <td>
-//       <div id="divButton-WsRequest_1367">
-//           <a id="WSREQUEST_1367_button"
-//               class="btn tul-blue-malibu" style="display: inline; margin: 0.5em;border-radius: 2em;">Replay
-//           </a>
-//       </div>
-//   </td>
-// </tr>
-// `;
-// renderAndCompare('Example06', html06, context06, expectedHtml06);
+// WORKAROUND WHEN generating a not valid html from a DOM parser point of view (ex <tr> not inside a <table>)
+const context06 = {
+  requestId:1367,
+  creation:"2022-11-23 11:01:35",
+  name:"getLoanSimulation:957",
+  status:"finished_error",
+  url:"/case/rest/testthymleafjs/36363/1367",
+  displayBtn: true,
+  btnText: "Replay"
+};
+const html06 = `
+<my-tr th:data-request-id="{requestId}" th:data-status-id="{status}">
+  <my-td th:text="{creation}"></my-td>
+  <my-td th:text="{name}"></my-td>
+  <my-td>
+      <a th:if="{url}" th:href="{url}">
+          <i class="fas fa-file-download fa-2x" style="color: #A7A8AA"></i>
+      </a>
+  </my-td>
+  <my-td>
+      <strong th:text="{status}"></strong> : <span th:text="{errorMessage}"></span>
+  </my-td>
+  <my-td>
+      <div th:id="'divButton-WsRequest_' + {requestId}">
+          <a th:if="{displayBtn and (status == 'finished_error' or status == 'finished_timeout')}"
+              class="btn tul-blue-malibu" style="display: inline; margin: 0.5em;border-radius: 2em;"
+              th:id="'WSREQUEST_' + {requestId} + '_button'"
+              th:text="{btnText}">
+          </a>
+      </div>
+  </my-td>
+</my-tr>
+`;
+const expectedHtml06 = `
+<my-tr data-request-id="1367" data-status-id="finished_error">
+  <my-td>2022-11-23 11:01:35</my-td>
+  <my-td>getLoanSimulation:957</my-td>
+  <my-td>
+    <a href="/case/rest/testthymleafjs/36363/1367">
+      <i class="fas fa-file-download fa-2x" style="color: #A7A8AA"></i>
+    </a>
+  </my-td>
+  <my-td>
+    <strong>finished_error</strong> : <span></span>
+  </my-td>
+  <my-td>
+      <div id="divButton-WsRequest_1367">
+          <a id="WSREQUEST_1367_button"
+              class="btn tul-blue-malibu" style="display: inline; margin: 0.5em;border-radius: 2em;">Replay</a>
+      </div>
+  </my-td>
+</my-tr>
+`;
+renderAndCompare('Example06', html06, context06, expectedHtml06);
 

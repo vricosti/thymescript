@@ -14,18 +14,57 @@ This library is perfect for those who are looking for a simple (8kB) yet powerfu
 
 ## Differences with server-side Thymeleaf (Java)  
 
-- Since we are inside the browser and to be able to use Template string we use the `th:{varName}` instead of `th:${varName}`.
+Since we are inside the browser and to be able to use Template string we use the `th:{varName}` instead of `th:${varName}`.
 
 Following attributes are not implemented (yet):  
 
 - th:block is not yet implemented 
 - th:var
-- th:href, th:src, th:action
-- th:include, th:replace, th:insert, th:fragment
+- th:remove, th:include, th:replace, th:insert, th:fragment
 - th:switch, th:case
-- th:field, th:label, th:option, th:optgroup, th:errorclass, th:errors
-- th:inline, th:remove, th:assert, th:alias, th:data
-- ...  
+
+Currently because of the way a DOM parser works it cannot render part of html that is not valid  
+from a DOM parser point of view (for instance a `<tr>` not inside a `<table>`)
+
+``` html
+<tr th:data-request-id="{requestId}" th:data-status-id="{status}">
+  <td th:text="{creation}"></td>
+  <td th:text="{name}"></td>
+</tr>
+```
+You will have to trick the parser by using a custom element (ex: `<my-tr>`, `<my-td>`):  
+
+``` html
+  <my-tr th:data-request-id="{requestId}" th:data-status-id="{status}">
+    <my-td th:text="{creation}"></my-td>
+    <my-td th:text="{name}"></my-td>
+  </my-tr>
+```
+
+Then render and replace:  
+
+``` javascript
+const context = {
+  requestId:1367,
+  creation:"2022-11-23 11:01:35",
+  name:"getLoanSimulation:957",
+  status:"finished_error"
+};
+
+// render the 'invalid' (from DOM parser point of view) html
+const rendered = ThymeleafJs.render(template, context);
+const updatedTemplate = rendered
+  .replace(/<my-tr/g, '<tr').replace(/<\/my-tr>/g, '</tr>')
+  .replace(/<my-td/g, '<td').replace(/<\/my-td>/g, '</td>');
+
+```
+
+I might address this point later on but for performance reason it's always better to render valid html.
+Possible workarounds:
+
+- Provide a render_invalid_html function where internally it will transform nodes into custom elements,  
+renders then replace elements
+- Use a light html parser instead of browser dom parser
 
 ## Installation
 
