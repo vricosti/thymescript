@@ -31,6 +31,7 @@ const context01 = {
   name: 'Vince Ricosti',
   age: 45,
   isAdmin: true,
+  cssStyle: 'warning',
   message: 'ChatGPT is amazing!',
   messageWelcome: 'Welcome to our <b>fantastic</b> grocery store!',
   teacher: {
@@ -60,7 +61,6 @@ const context01 = {
       }
     }
   },
-  cssStyle: 'warning'
 };
 
 const html01 = `
@@ -196,7 +196,7 @@ const context05 = {
 };
 const html05 = `
 <table class="table" th:classappend="{condition ? 'condition-true' : ''}" style="margin-bottom: 0;">
-  <tr th:each="item : {items}" th:if="{item != null}" th:attr="data-request-id={item.requestId}, data-status-id={item.status}">
+  <tr th:each="item, itemStat : {items}" th:if="{item != null}" th:attr="data-request-id={item.requestId}, data-status-id={item.status}">
     <td th:text="{item.creation}">DefaultValue</td>
   </tr>
 </table>
@@ -274,3 +274,64 @@ const expectedHtml06 = `
 `;
 renderAndCompare('Example06', html06, context06, expectedHtml06);
 
+// // Example07
+// const context07 = {
+//   cssStyle: 'warning',
+//   stars: [
+//     {
+//       name: 'Leonardo DiCaprio',
+//       age: 47,
+//       email: 'leo.dicaprio123@gmail.com',
+//       gender: 'M'
+//     },
+//     {
+//       name: 'Meryl Streep',
+//       age: 72,
+//       email: 'meryl.streep456@yahoo.com',
+//       gender: 'F'
+//     },
+//     {
+//       name: 'Tom Hanks',
+//       age: 65,
+//       email: 'tom.hanks789@hotmail.com',
+//       gender: 'M',
+//       children: {
+//         'Colin Hanks': { age: 45 }
+//       }
+//     }
+//   ]
+// };
+
+// const template07 = `
+//   <html>
+//     <head></head>
+//     <body>
+//       <div class="container">
+//         <h1 class="text-center mt-5">Movie Stars</h1>
+//         <div class="row">
+//           <div class="col-md-6" th:each="star : {stars}">
+//             <div class="card">
+//               <div class="card-body">
+//                 <h5 class="card-title" th:text="*{name}"></h5>
+//                 <p class="card-text">
+//                   <strong>Age:</strong> <span th:text="*{age}"></span><br>
+//                   <strong>Email:</strong> <span th:text="*{email}"></span><br>
+//                   <strong>Gender:</strong> <span th:text="*{gender}"></span>
+//                 </p>
+//                 <p th:if="*{children}">
+//                   <strong>Children:</strong>
+//                   <ul>
+//                     <li th:each="child : *{children}" th:text="child.key + ': ' + child.value.age + ' years old'"></li>
+//                   </ul>
+//                 </p>
+//                 <button type="button" class="btn btn-primary" th:attrappend="class={' ' + cssStyle}">View Profile</button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </body>
+//   </html>
+//   `;
+
+//   renderAndCompare('Example07', template07, context07, '');

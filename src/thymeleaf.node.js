@@ -43,16 +43,17 @@ import prettier from 'prettier';
   
     render(html, userContext) {
       
+
+      const document = ThymeleafJs.createDOMParser(`${html}`);
+
       const context = {
         attrName: '',
         globalContext: userContext,
         objectContexts: [],
       };
-  
-      //const dom = new JSDOM(`${html}`);
-      const document = ThymeleafJs.createDOMParser(`${html}`);
+
+      
       this.processNode(document.body, context);
-      //return document.body.innerHTML;
     
       const hasHtmlTag = /<html[\s\S]*?>/i.test(html);
       if (hasHtmlTag) {
@@ -128,28 +129,54 @@ import prettier from 'prettier';
   
   
     processEach(node, attr, context) {
-      const [rawVarName, expression] = attr.value.split(':');
-      const varName = rawVarName.trim();
+      // Split the attribute value by the colon character
+      const [leftPart, expression] = attr.value.split(':');
+      const varNames = leftPart.trim().split(',');
+
+      // Extract the main variable name and the index variable name (if provided)
+      const varName = varNames[0].trim();
+      const rawStatusVarName = varNames.length > 1 ? varNames[1].trim() : null;
+      const statusVarName = rawStatusVarName ? rawStatusVarName.trim() : `${varName}Stat`;
       const dataArray = this.evaluate(expression, context);
-  
+    
       const parent = node.parentNode;
       node.removeAttribute(attr.name);
-  
+    
       // We clone the current node and we remove it
       const originalClone = node.cloneNode(true);
       parent.removeChild(node);
-      
-      for (const item of dataArray) {
+    
+      for (let i = 0; i < dataArray.length; i++) {
+        const item = dataArray[i];
         if (item === null) continue;
-        
-        const newContext = { ...context, globalContext: { ...context.globalContext, [varName]: item }, };
-  
+    
+        // Build a status variable
+        const status = {
+          index: i,
+          count: i + 1,
+          size: dataArray.length,
+          current: item,
+          even: i % 2 === 0,
+          odd: i % 2 !== 0,
+          first: i === 0,
+          last: i === dataArray.length - 1,
+        };
+    
+        const newContext = {
+          ...context,
+          globalContext: {
+            ...context.globalContext,
+            [varName]: item,
+            [statusVarName]: status,
+          },
+        };
+    
         // We append a copy of the clone
         const clone = parent.appendChild(originalClone.cloneNode(true));
-        //console.log('newContext= ', newContext);
         this.processNode(clone, newContext);
       }
     }
+    
   
     processIf(node, attr, context) {
       
