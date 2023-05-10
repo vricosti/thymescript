@@ -296,7 +296,10 @@ renderAndCompare('Example06', html06, context06, expectedHtml06);
 //       email: 'tom.hanks789@hotmail.com',
 //       gender: 'M',
 //       children: {
-//         'Colin Hanks': { age: 45 }
+//         'Colin Hanks': { age: 45 },
+//         'Chester Hanks': { age: 32 },
+//         'Truman Hanks': { age: 27 },
+//         'Elizabeth Hanks': { age: 40 },
 //       }
 //     }
 //   ]

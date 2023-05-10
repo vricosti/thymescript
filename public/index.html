@@ -14,7 +14,7 @@
       margin-bottom: 15px;
     }
   </style>
-  <script>
+  <!-- <script>
     document.addEventListener('DOMContentLoaded', () => {
       
       const template = `
@@ -79,8 +79,8 @@
       const output = ThymeleafJs.render(template, context);
       document.getElementById('app').innerHTML = output;
     });
-  </script>
-  <!-- <script>
+  </script> -->
+  <script>
     document.addEventListener('DOMContentLoaded', () => {
       const template = `
         <html>
@@ -135,7 +135,10 @@
             email: 'tom.hanks789@hotmail.com',
             gender: 'M',
             children: {
-              'Colin Hanks': { age: 45 }
+              'Colin Hanks': { age: 45 },
+              'Chester Hanks': { age: 32 },
+              'Truman Hanks': { age: 27 },
+              'Elizabeth Hanks': { age: 40 },
             }
           }
         ]
@@ -143,7 +146,7 @@
       const output = ThymeleafJs.render(template, context);
       document.getElementById('app').innerHTML = output;
     });
-  </script> -->
+  </script>
 </head>
 <body>
   <div id="app">
