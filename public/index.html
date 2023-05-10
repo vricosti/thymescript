@@ -4,7 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ThymeleafJs Example</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <script src="../dist/thymeleaf.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .card {
+      margin-bottom: 15px;
+    }
+  </style>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       
@@ -71,6 +80,70 @@
       document.getElementById('app').innerHTML = output;
     });
   </script>
+  <!-- <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const template = `
+        <html>
+          <head></head>
+          <body>
+            <div class="container">
+              <h1 class="text-center mt-5">Movie Stars</h1>
+              <div class="row">
+                <div class="col-md-6" th:each="star: {stars}">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title" th:text="*{name}"></h5>
+                      <p class="card-text">
+                        <strong>Age:</strong> <span th:text="*{age}"></span><br>
+                        <strong>Email:</strong> <span th:text="*{email}"></span><br>
+                        <strong>Gender:</strong> <span th:text="*{gender}"></span>
+                      </p>
+                      <p th:if="*{children}">
+                        <strong>Children:</strong>
+                        <ul>
+                          <li th:each="child : *{children}" th:text="child.key + ': ' + child.value.age + ' years old'"></li>
+                        </ul>
+                      </p>
+                      <button type="button" class="btn btn-primary" th:attrappend="class={' ' + cssStyle}">View Profile</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </body>
+        </html>
+      `;
+
+      const context = {
+        cssStyle: 'warning',
+        stars: [
+          {
+            name: 'Leonardo DiCaprio',
+            age: 47,
+            email: 'leo.dicaprio123@gmail.com',
+            gender: 'M'
+          },
+          {
+            name: 'Meryl Streep',
+            age: 72,
+            email: 'meryl.streep456@yahoo.com',
+            gender: 'F'
+          },
+          {
+            name: 'Tom Hanks',
+            age: 65,
+            email: 'tom.hanks789@hotmail.com',
+            gender: 'M',
+            children: {
+              'Colin Hanks': { age: 45 }
+            }
+          }
+        ]
+      };
+      const output = ThymeleafJs.render(template, context);
+      document.getElementById('app').innerHTML = output;
+    });
+  </script> -->
 </head>
 <body>
   <div id="app">
