@@ -274,67 +274,120 @@ const expectedHtml06 = `
 `;
 renderAndCompare('Example06', html06, context06, expectedHtml06);
 
-// // Example07
-// const context07 = {
-//   cssStyle: 'warning',
-//   stars: [
-//     {
-//       name: 'Leonardo DiCaprio',
-//       age: 47,
-//       email: 'leo.dicaprio123@gmail.com',
-//       gender: 'M'
-//     },
-//     {
-//       name: 'Meryl Streep',
-//       age: 72,
-//       email: 'meryl.streep456@yahoo.com',
-//       gender: 'F'
-//     },
-//     {
-//       name: 'Tom Hanks',
-//       age: 65,
-//       email: 'tom.hanks789@hotmail.com',
-//       gender: 'M',
-//       children: {
-//         'Colin Hanks': { age: 45 },
-//         'Chester Hanks': { age: 32 },
-//         'Truman Hanks': { age: 27 },
-//         'Elizabeth Hanks': { age: 40 },
-//       }
-//     }
-//   ]
-// };
+// Example07
+const context07 = {
+  cssStyle: 'warning',
+  stars: [
+    {
+      name: 'Leonardo DiCaprio',
+      age: 47,
+      email: 'leo.dicaprio123@gmail.com',
+      gender: 'M'
+    },
+    {
+      name: 'Meryl Streep',
+      age: 72,
+      email: 'meryl.streep456@yahoo.com',
+      gender: 'F'
+    },
+    {
+      name: 'Tom Hanks',
+      age: 65,
+      email: 'tom.hanks789@hotmail.com',
+      gender: 'M',
+      children: {
+        'Colin Hanks': { age: 45 },
+        'Chester Hanks': { age: 32 },
+        'Truman Hanks': { age: 27 },
+        'Elizabeth Hanks': { age: 40 },
+      }
+    }
+  ]
+};
 
-// const template07 = `
-//   <html>
-//     <head></head>
-//     <body>
-//       <div class="container">
-//         <h1 class="text-center mt-5">Movie Stars</h1>
-//         <div class="row">
-//           <div class="col-md-6" th:each="star : {stars}">
-//             <div class="card">
-//               <div class="card-body">
-//                 <h5 class="card-title" th:text="*{name}"></h5>
-//                 <p class="card-text">
-//                   <strong>Age:</strong> <span th:text="*{age}"></span><br>
-//                   <strong>Email:</strong> <span th:text="*{email}"></span><br>
-//                   <strong>Gender:</strong> <span th:text="*{gender}"></span>
-//                 </p>
-//                 <p th:if="*{children}">
-//                   <strong>Children:</strong>
-//                   <ul>
-//                     <li th:each="child : *{children}" th:text="child.key + ': ' + child.value.age + ' years old'"></li>
-//                   </ul>
-//                 </p>
-//                 <button type="button" class="btn btn-primary" th:attrappend="class={' ' + cssStyle}">View Profile</button>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </body>
-//   </html>
-//   `;
+const template07 = `
+  <html>
+    <head></head>
+    <body>
+      <div class="container">
+        <h1 class="text-center mt-5">Movie Stars</h1>
+        <div class="row">
+          <div class="col-md-6" th:each="star: {stars}">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title" th:text="*{name}"></h5>
+                <p class="card-text">
+                  <strong>Age:</strong> <span th:text="*{age}"></span><br>
+                  <strong>Email:</strong> <span th:text="*{email}"></span><br>
+                  <strong>Gender:</strong> <span th:text="*{gender}"></span>
+                </p>
+                <p th:if="*{children}">
+                  <strong>Children:</strong>
+                  <ul>
+                    <li th:each="child : *{children}" th:text="child.key + ': ' + child.value.age + ' years old'"></li>
+                  </ul>
+                </p>
+                <button type="button" class="btn btn-primary" th:attrappend="class={' ' + cssStyle}">View Profile</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </body>
+  </html>
+  `;
 
-//   renderAndCompare('Example07', template07, context07, '');
+  const expectedHtml07 = `
+    <div class="container">
+      <h1 class="text-center mt-5">Movie Stars</h1>
+      <div class="row">
+      <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Leonardo DiCaprio</h5>
+              <p class="card-text">
+                <strong>Age:</strong><span>47</span><br>
+                <strong>Email:</strong><span>leo.dicaprio123@gmail.com</span><br>
+                <strong>Gender:</strong><span>M</span>
+              </p><ul></ul>
+              <p></p>
+              <button type="button" class="btn btn-primary  warning">View Profile</button>
+            </div>
+          </div>
+        </div><div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Meryl Streep</h5>
+              <p class="card-text">
+                <strong>Age:</strong><span>72</span><br>
+                <strong>Email:</strong><span>meryl.streep456@yahoo.com</span><br>
+                <strong>Gender:</strong><span>F</span>
+              </p><ul></ul>
+              <p></p>
+              <button type="button" class="btn btn-primary  warning">View Profile</button>
+            </div>
+          </div>
+        </div><div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Tom Hanks</h5>
+              <p class="card-text">
+                <strong>Age:</strong><span>65</span><br>
+                <strong>Email:</strong><span>tom.hanks789@hotmail.com</span><br>
+                <strong>Gender:</strong><span>M</span>
+              </p>
+              <p><strong>Children:</strong></p>
+              <ul>
+                <li>Colin Hanks: 45 years old</li>
+                <li>Chester Hanks: 32 years old</li>
+                <li>Truman Hanks: 27 years old</li>
+                <li>Elizabeth Hanks: 40 years old</li>
+              </ul>
+              <p></p>
+              <button type="button" class="btn btn-primary  warning">View Profile</button>
+            </div>
+          </div>
+        </div></div>
+    </div>`;
+
+  renderAndCompare('Example07', template07, context07, expectedHtml07);

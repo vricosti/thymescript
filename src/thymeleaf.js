@@ -297,6 +297,20 @@ const TEXT_NODE = 3;
     }
     
     evaluate(expression, context) {
+
+      // Simply check if expression contains at least a { - it's stupid in this case
+      // to use a th: attributes but we need to handle the case
+      // I suppose you need a better way of detecting this but for now it works with all my cases
+      const trimmedExpr = expression.trimStart();
+      if (!trimmedExpr.length ||
+          (trimmedExpr.length &&
+          trimmedExpr.indexOf('{') === -1 && 
+          trimmedExpr.indexOf('+') === -1 &&
+          trimmedExpr[0] !== '\'' && trimmedExpr[0] !== '"')) {
+        return expression;
+      }
+
+
       const contextKeys = Object.keys(context.globalContext);
       const contextValues = Object.values(context.globalContext);
   
@@ -310,13 +324,6 @@ const TEXT_NODE = 3;
   
         // TODO: rewrite code below because not enought strict and robust
 
-        //console.log('context.curContexts: ', context.curContexts);
-      
-        // if there is an array of curContexts ex [friends['Tom Hanks'], children['Colin Hanks']]
-        // We build the full context path: friends['Tom Hanks'].children['Colin Hanks']
-        const curContext = context.curContexts.length ? context.curContexts.join('.') : '';
-        
-        
         // Code below parse an expression and identify the variables inside {} (but ignore inside *{})
         // You really think I could write this, of course not, ChatGPT powered
         // Maybe rewrite with a manual parsing easier to maintain and understand
@@ -338,8 +345,10 @@ const TEXT_NODE = 3;
           }
         }
 
-        //console.log('expr: ', expr);
-        //console.log('variables: ', variables);
+        
+        // if there is an array of curContexts ex [friends['Tom Hanks'], children['Colin Hanks']]
+        // We build the full context path: friends['Tom Hanks'].children['Colin Hanks']
+        const curContext = context.curContexts.length ? context.curContexts.join('.') : '';
 
         expr = expr.replace(/(\*?){([^}]+)}/g, (match, p1, p2) => {
           return (p1 === '*' && curContext) ? curContext + '.' + p2 : p2;
