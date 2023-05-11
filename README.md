@@ -12,6 +12,83 @@ This library is perfect for those who are looking for a simple (8kB) yet powerfu
 - Customizable attribute expressions and processing
 - Seamless integration with popular JavaScript frameworks
 
+## Installation
+
+For the moment there is no npm package, you have to build the library and copy it inside your project:  
+
+`npm run build:prod`
+
+## Usage  
+
+### 1. Include ThymeleafJs in your HTML file
+
+``` html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ThymeleafJs Example</title>
+    <script src="dist/thymeleaf.min.js"></script>
+    <script id="template">...SEE BELOW...</script>
+</head>
+<body>
+  <div id="app">
+    <!-- !! The ThymeleafJs output will be inserted here !! -->
+  </div>
+</body>
+</html>
+```
+
+### 2. Create an HTML template with ThymeleafJs attributes
+
+``` html
+<script id="template">
+    document.addEventListener('DOMContentLoaded', () => {
+      
+      const template = `
+        <div th:object="{user}">
+          <h1>Welcome, <span th:text="*{name}"></span>!</h1>
+          <p>Your email address is: <span th:text="*{email}"></span></p>
+          <p>Your friends:</p>
+          <ul>
+              <li th:each="friend : *{friends}">
+                  <span th:text="{friend.name}">Friend's Name</span>
+              </li>
+          </ul>
+        </div>
+        `;
+
+      const context = {
+          user: {
+              name: 'John Doe',
+              email: 'john.doe@example.com',
+              friends: [
+                  { name: 'Alice' },
+                  { name: 'Bob' }
+              ]
+          }
+      };
+      
+      const output = ThymeleafJs.render(template, context);
+      document.getElementById('app').innerHTML = output;
+    });
+  </script>
+```
+
+This will render the following HTML:  
+
+``` html
+<div>
+    <h1>Welcome, John Doe!</h1>
+    <p>Your email address is: john.doe@example.com</p>
+    <p>Your friends:</p>
+    <ul>
+        <li>Alice</li>
+        <li>Bob</li>
+    </ul>
+</div>
+```
+
 ## Differences with server-side Thymeleaf (Java)  
 
 Since we are inside the browser and to be able to use Template string we use the `th:{varName}` instead of `th:${varName}`.
@@ -64,89 +141,14 @@ Possible workarounds:
 
 - Provide a render_invalid_html function where internally it will transform nodes into custom elements,  
 renders then replace elements
-- Use a light html parser instead of browser dom parser
+- Use a light html parser instead of browser dom parser  
 
-## Installation
+## Debug && run demo  
 
-For the moment there is no npm package, you have to build the library and copy it inside your project:  
+`npm install`
 
-`npm run build:prod`
-
-## Usage  
-
-### 1. Include ThymeleafJs in your HTML file
-
-``` html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>ThymeleafJs Example</title>
-    <script src="dist/thymeleaf.min.js"></script>
-    <script id="template">...SEE BELOW...</script>
-</head>
-<body>
-  <div id="app">
-    <!-- !! The ThymeleafJs output will be inserted here !! -->
-  </div>
-</body>
-</html>
-```
-
-### 2. Create an HTML template with ThymeleafJs attributes
-
-``` html
-<script id="template">
-    document.addEventListener('DOMContentLoaded', () => {
-      
-      const template = `
-        <div vr:object="{user}">
-          <h1>Welcome, <span th:text="*{name}"></span>!</h1>
-          <p>Your email address is: <span th:text="*{email}"></span></p>
-          <p>Your friends:</p>
-          <ul>
-              <li vr:each="friend : *{friends}">
-                  <span th:text="{friend.name}">Friend's Name</span>
-              </li>
-          </ul>
-        </div>
-        `;
-
-      const context = {
-          user: {
-              name: 'John Doe',
-              email: 'john.doe@example.com',
-              friends: [
-                  { name: 'Alice' },
-                  { name: 'Bob' }
-              ]
-          }
-      };
-      
-      const output = ThymeleafJs.render(template, context);
-      document.getElementById('app').innerHTML = output;
-    });
-  </script>
-```
-
-This will render the following HTML:  
-
-``` html
-<div>
-    <h1>Welcome, John Doe!</h1>
-    <p>Your email address is: john.doe@example.com</p>
-    <p>Your friends:</p>
-    <ul>
-        <li>Alice</li>
-        <li>Bob</li>
-    </ul>
-</div>
-```
-
-
-## Run example  
-
-`npm run serve`
+To starts the tests: `npm run serve`
+To launch the demo: `npm run test:node`
 
 ## Contributing
 
