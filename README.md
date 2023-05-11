@@ -101,12 +101,12 @@ For the moment there is no npm package, you have to build the library and copy i
       
       const template = `
         <div vr:object="{user}">
-          <h1>Welcome, <span vr:text="*{name}"></span>!</h1>
-          <p>Your email address is: <span vr:text="*{email}"></span></p>
+          <h1>Welcome, <span th:text="*{name}"></span>!</h1>
+          <p>Your email address is: <span th:text="*{email}"></span></p>
           <p>Your friends:</p>
           <ul>
               <li vr:each="friend : *{friends}">
-                  <span vr:text="{friend.name}">Friend's Name</span>
+                  <span th:text="{friend.name}">Friend's Name</span>
               </li>
           </ul>
         </div>
