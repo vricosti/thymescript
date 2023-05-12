@@ -16,7 +16,10 @@ This library is perfect for those who are looking for a simple (8kB) yet powerfu
 
 For the moment there is no npm package, you have to build the library and copy it inside your project:  
 
-`npm run build:prod`
+```
+npm install
+npm run build:prod
+```
 
 ## Usage  
 
@@ -144,8 +147,6 @@ renders then replace elements
 - Use a light html parser instead of browser dom parser  
 
 ## Debug && run demo  
-
-`npm install`
 
 To starts the tests: `npm run serve`
 To launch the demo: `npm run test:node`

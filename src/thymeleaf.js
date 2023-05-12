@@ -81,9 +81,6 @@ const TEXT_NODE = 3;
           if (directiveFn) {
             context.attrName = attr.name;
             directiveFn.call(this, node, attr, context);
-            if (attr.name === 'th:each') {
-              return;
-            }
           } else {
             this.processStandardAttr(node, attr, context);
           }
@@ -102,38 +99,11 @@ const TEXT_NODE = 3;
         let hasObjectAttr = false;
         if (node.hasAttribute('th:object')) {
           this.processObject(node, node.getAttributeNode('th:object'), context);
-          //hasObjectAttr = true;
         } else if (node.hasAttribute('th:each')) {
           this.processEach(node, node.getAttributeNode('th:each'), context);
         } else {
           this.processAttributesAndChildren(node, context);
         }
-  
-  
-        // //console.log('node.nodeType: ', node.nodeType);
-        // const regex = /th:([\w-]+)/;
-        // for (const attr of Array.from(node.attributes)) {
-        //   if (attr.name.startsWith("th:")) {
-        //     const directiveFn = this.directives[attr.name];
-        //     if (directiveFn) {
-        //       context.attrName = attr.name;
-        //       directiveFn.call(this, node, attr, context);
-        //       if (attr.name === 'th:each') {
-        //         return;
-        //       }
-        //     } else {
-        //       this.processStandardAttr(node, attr, context);
-        //     }
-        //   }
-        // }
-  
-        // //console.log('node.childNodes: ', node.childNodes);
-        // for (const child of Array.from(node.childNodes)) {
-        //   this.processNode(child, context);
-        // }
-        // if (hasObjectAttr) {
-        //   context.curContexts.pop();
-        // }
       }
     }
   
