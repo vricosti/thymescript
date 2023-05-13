@@ -391,3 +391,74 @@ const template07 = `
     </div>`;
 
   renderAndCompare('Example07', template07, context07, expectedHtml07);
+
+  // const context08 = {
+  //   prods: [
+  //     {
+  //       name: "Onions",
+  //       price: 2.41,
+  //       inStock: true,
+  //       comments: ["Great product!", "Very fresh"],
+  //       id: 1
+  //     },
+  //     {
+  //       name: "Blue Lettuce",
+  //       price: 9.55,
+  //       inStock: false,
+  //       comments: [],
+  //       id: 2
+  //     },
+  //     {
+  //       name: "Mild Cinnamon",
+  //       price: 1.99,
+  //       inStock: true,
+  //       comments: ["Good taste", "Well packaged", "Fast delivery"],
+  //       id: 3
+  //     }
+  //   ]
+  // };
+  
+    
+  // const template08 = `
+  // <table>
+  // <thead>
+  //   <tr>
+  //     <th>NAME</th>
+  //     <th>PRICE</th>
+  //     <th>IN STOCK</th>
+  //     <th>COMMENTS</th>
+  //   </tr>
+  // </thead>
+  // <tbody th:remove="all-but-first">
+  //   <tr th:each="prod : {prods}" th:class="{prodStat.odd}? 'odd' : ''">
+  //     <td th:text="{prod.name}">Onions</td>
+  //     <td th:text="{prod.price}">2.41</td>
+  //     <td th:text="{prod.inStock}? #{true} : #{false}">yes</td>
+  //     <td>
+  //       <span th:text="{#lists.size(prod.comments)}">2</span> comment/s
+  //       <a href="comments.html" 
+  //          th:href="@{/product/comments(prodId={prod.id})}" 
+  //          th:unless="{#lists.isEmpty(prod.comments)}">view</a>
+  //     </td>
+  //   </tr>
+  //   <tr class="odd">
+  //     <td>Blue Lettuce</td>
+  //     <td>9.55</td>
+  //     <td>no</td>
+  //     <td>
+  //       <span>0</span> comment/s
+  //     </td>
+  //   </tr>
+  //   <tr>
+  //     <td>Mild Cinnamon</td>
+  //     <td>1.99</td>
+  //     <td>yes</td>
+  //     <td>
+  //       <span>3</span> comment/s
+  //       <a href="comments.html">view</a>
+  //     </td>
+  //   </tr>
+  // </tbody>
+  // `;
+
+  // renderAndCompare('Example08', template08, context08, '');
