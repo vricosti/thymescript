@@ -1,5 +1,8 @@
-const ELEMENT_NODE = 1;
-const TEXT_NODE = 3;
+import lists from './utilities/lists.js';
+
+  // Declare constants inside the class
+  const ELEMENT_NODE = 1;
+  const TEXT_NODE = 3;
 
   class ThymeleafJs {
 
