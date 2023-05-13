@@ -375,6 +375,20 @@ class ThymeleafJs {
     // For now we don't handle #{foo} internationalization syntax => replace with 'foo'
     expr = expr.replace(/#\{([^}]+)\}/g, "'$1'");
 
+    // Detect and process Thymeleaf-style URLs @{.....} in the expression
+    // '@{/product/comments(prodId=${prod.id})}' => '/product/comments?prodId=123'
+    console.log('expr: ', expr);
+    const urlTemplateRegex = /@\{(.*)\}/;
+    let urlTemplateMatch;
+    while ((urlTemplateMatch = urlTemplateRegex.exec(expr)) !== null) {
+      console.log('urlTemplateMatch[0]: ', urlTemplateMatch[0]);
+      console.log('urlTemplateMatch[1]: ', urlTemplateMatch[1]);
+      const urlTemplate = urlTemplateMatch[1];
+      const url = this.generateURL(urlTemplate, context); // Implement this function to generate the correct URL
+      expr = expr.replace(urlTemplateMatch[0], url);
+    }
+
+
     // Code below parse an expression and identify the variables inside {} (but ignore inside *{})
     // You really think I could write this, of course not, ChatGPT powered
     // Maybe rewrite with a manual parsing easier to maintain and understand
