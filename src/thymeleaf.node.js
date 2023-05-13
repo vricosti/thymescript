@@ -346,11 +346,11 @@ class ThymeleafJs {
   // URL generation function
   generateURL(template, params) {
     let url = template;
-  
+
     for (let [key, value] of Object.entries(params)) {
       url = url.replace(`(${key}=${key})`, `${key}=${value}`);
     }
-  
+
     return url;
   }
 
