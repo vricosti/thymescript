@@ -10,7 +10,13 @@ const lists = {
     },
 
     isEmpty: function (list) {
-        return this.size(list) === 0;
+        if (Array.isArray(list)) {
+            return list.length === 0;
+        } else if (typeof list === 'object' && list !== null) {
+            return Object.keys(list).length === 0;
+        } else {
+            return false;
+        }
     },
 
     contains: function (list, element) {

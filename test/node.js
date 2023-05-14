@@ -389,8 +389,7 @@ const template07 = `
           </div>
         </div></div>
     </div>`;
-
-  renderAndCompare('Example07', template07, context07, expectedHtml07);
+renderAndCompare('Example07', template07, context07, expectedHtml07);
 
   // const context08 = {
   //   prods: [

@@ -50,6 +50,7 @@ class ThymeleafJs {
     const document = ThymeleafJs.createDOMParser(`${html}`);
 
     const context = {
+      document: document,
       attrName: '',
       globalContext: userContext,
       curContexts: [],
@@ -84,9 +85,9 @@ class ThymeleafJs {
     const regex = /th:([\w-]+)/;
     for (const attr of Array.from(node.attributes)) {
       if (attr.name.startsWith("th:")) {
+        context.attrName = attr.name;
         const directiveFn = this.directives[attr.name];
         if (directiveFn) {
-          context.attrName = attr.name;
           directiveFn.call(this, node, attr, context);
         } else {
           this.processStandardAttr(node, attr, context);
@@ -157,6 +158,10 @@ class ThymeleafJs {
     const parent = node.parentNode;
     node.removeAttribute(attr.name);
 
+     // Create a marker node and insert it at the position of the original node
+    const markerNode = context.document.createTextNode('');
+    parent.insertBefore(markerNode, node);
+
     // We clone the current node and we remove it
     const originalClone = node.cloneNode(true);
     parent.removeChild(node);
@@ -191,10 +196,14 @@ class ThymeleafJs {
 
       // We append a copy of the clone
       const clone = parent.appendChild(originalClone.cloneNode(true));
+      parent.insertBefore(clone, markerNode);
       this.processNode(clone, newContext);
 
       context.curContexts.pop();
     }
+
+    // Remove the marker node after all new nodes have been inserted
+    parent.removeChild(markerNode);
   }
 
 
@@ -222,37 +231,37 @@ class ThymeleafJs {
     node.removeAttribute(attr.name);
 
     // We let him continue the rendering
-    console.log('before: ', node.outerHTML);
+    //console.log('before: ', node.outerHTML);
     this.processNode(node, context);
-    console.log('after: ', node.outerHTML);
+    //console.log('after: ', node.outerHTML);
 
 
-    switch (removalType) {
-      case 'all':
-        node.parentNode.removeChild(node);
-        break;
-      case 'body':
-        while (node.firstChild) {
-          node.removeChild(node.firstChild);
-        }
-        break;
-      case 'tag':
-        let fragment = document.createDocumentFragment();
-        while (node.firstChild) {
-          fragment.appendChild(node.firstChild);
-        }
-        node.parentNode.replaceChild(fragment, node);
-        break;
-      case 'all-but-first':
-        while (node.childNodes.length > 1) {
-          node.removeChild(node.lastChild);
-        }
-        break;
-      case 'none':
-      default:
-        // do nothing
-        break;
-    }
+    // switch (removalType) {
+    //   case 'all':
+    //     node.parentNode.removeChild(node);
+    //     break;
+    //   case 'body':
+    //     while (node.firstChild) {
+    //       node.removeChild(node.firstChild);
+    //     }
+    //     break;
+    //   case 'tag':
+    //     let fragment = document.createDocumentFragment();
+    //     while (node.firstChild) {
+    //       fragment.appendChild(node.firstChild);
+    //     }
+    //     node.parentNode.replaceChild(fragment, node);
+    //     break;
+    //   case 'all-but-first':
+    //     while (node.childNodes.length > 1) {
+    //       node.removeChild(node.lastChild);
+    //     }
+    //     break;
+    //   case 'none':
+    //   default:
+    //     // do nothing
+    //     break;
+    // }
   }
   processUText(node, attr, context) {
     const text = this.evaluate(attr.value, context);
@@ -337,15 +346,24 @@ class ThymeleafJs {
   }
 
   // URL generation function
-  generateURL(template, params) {
-    let url = template;
-
-    for (let [key, value] of Object.entries(params)) {
-      url = url.replace(`(${key}=${key})`, `${key}=${value}`);
+  convertPath(input) {
+    const regex = /\((.*?)\)/g;
+    let match = input.match(regex);
+    if (match) {
+        let parameters = match[0].slice(1, -1).split(',');
+        let queryParameters = parameters.map(param => {
+            let [key, value] = param.split('=');
+            if (value.startsWith("{") && value.endsWith("}")) {
+                value = "${" + value.slice(1, -1) + "}";
+            }
+            return `${key.trim()}=${value.trim()}`;
+        }).join('&');
+        return `\`${input.replace(regex, `?${queryParameters}`)}\``;
     }
+    return `'${input}'`;
+}
 
-    return url;
-  }
+
   evaluate(expression, context) {
 
     // Simply check if expression contains at least a { - it's stupid in this case
@@ -360,7 +378,7 @@ class ThymeleafJs {
       return expression;
     }
 
-
+    let urlhandled = false;
     const contextKeys = Object.keys(context.globalContext);
     const contextValues = Object.values(context.globalContext);
 
@@ -377,15 +395,16 @@ class ThymeleafJs {
 
     // Detect and process Thymeleaf-style URLs @{.....} in the expression
     // '@{/product/comments(prodId=${prod.id})}' => '/product/comments?prodId=123'
-    console.log('expr: ', expr);
+    //console.log('expr: ', expr);
     const urlTemplateRegex = /@\{(.*)\}/;
     let urlTemplateMatch;
     while ((urlTemplateMatch = urlTemplateRegex.exec(expr)) !== null) {
       console.log('urlTemplateMatch[0]: ', urlTemplateMatch[0]);
       console.log('urlTemplateMatch[1]: ', urlTemplateMatch[1]);
       const urlTemplate = urlTemplateMatch[1];
-      const url = this.generateURL(urlTemplate, context); // Implement this function to generate the correct URL
+      const url = this.convertPath(urlTemplate, context); // Implement this function to generate the correct URL
       expr = expr.replace(urlTemplateMatch[0], url);
+      urlhandled = true;
     }
 
 
@@ -400,24 +419,28 @@ class ThymeleafJs {
 
     let expressionMatch;
     while ((expressionMatch = expressionRegex.exec(expr)) !== null) {
-      if (expressionMatch.input[0] === '*') continue; // Ignore variables inside *{...}
+      if (expressionMatch.input[0] === '*') 
+        continue; // Ignore variables inside *{...}
       const expression = expressionMatch[1]
         .replace(quotedWordRegex, '')
         .replace(numberRegex, '');
       let variableMatch;
       while ((variableMatch = variableRegex.exec(expression)) !== null) {
-        variables.add(variableMatch[1]);
+        if (!variableMatch[0].startsWith('#')) {
+          variables.add(variableMatch[1]);
+        }
       }
     }
-
 
     // if there is an array of curContexts ex [friends['Tom Hanks'], children['Colin Hanks']]
     // We build the full context path: friends['Tom Hanks'].children['Colin Hanks']
     const curContext = context.curContexts.length ? context.curContexts.join('.') : '';
 
-    expr = expr.replace(/(\*?){([^}]+)}/g, (match, p1, p2) => {
-      return (p1 === '*' && curContext) ? curContext + '.' + p2 : p2;
-    });
+    if (!urlhandled) {
+      expr = expr.replace(/(\*?){([^}]+)}/g, (match, p1, p2) => {
+        return (p1 === '*' && curContext) ? curContext + '.' + p2 : p2;
+      });
+    }
 
     let undefinedValuesExpr = '';
     for (const variable of variables) {
