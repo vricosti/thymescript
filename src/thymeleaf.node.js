@@ -108,9 +108,9 @@ class ThymeleafJs {
         this.processObject(node, node.getAttributeNode('th:object'), context);
       } else if (node.hasAttribute('th:each')) {
         this.processEach(node, node.getAttributeNode('th:each'), context);
-      } else if (node.hasAttribute('th:remove')) {
+      } /*else if (node.hasAttribute('th:remove')) {
         this.processRemove(node, node.getAttributeNode('th:remove'), context);
-      }
+      }*/
       else {
         this.processAttributesAndChildren(node, context);
       }
@@ -158,13 +158,9 @@ class ThymeleafJs {
     const parent = node.parentNode;
     node.removeAttribute(attr.name);
 
-     // Create a marker node and insert it at the position of the original node
-    const markerNode = context.document.createTextNode('');
-    parent.insertBefore(markerNode, node);
-
     // We clone the current node and we remove it
     const originalClone = node.cloneNode(true);
-    parent.removeChild(node);
+    //parent.removeChild(node);
 
     const dataArray = data ? (Array.isArray(data) ? data : Object.entries(data)) : [];
     for (let i = 0; dataArray && i < dataArray.length; i++) {
@@ -194,16 +190,19 @@ class ThymeleafJs {
         },
       };
 
-      // We append a copy of the clone
-      const clone = parent.appendChild(originalClone.cloneNode(true));
-      parent.insertBefore(clone, markerNode);
-      this.processNode(clone, newContext);
-
+      // For the first iteration, use the current node
+      // For the remaining iterations, append a copy of the original clone
+      let currentNode;
+      if (i === 0) {
+        currentNode = node;
+      } else {
+        currentNode = node.appendChild(originalClone.cloneNode(true));
+      }
+      this.processNode(currentNode, newContext);
       context.curContexts.pop();
     }
 
-    // Remove the marker node after all new nodes have been inserted
-    parent.removeChild(markerNode);
+
   }
 
 
@@ -350,18 +349,18 @@ class ThymeleafJs {
     const regex = /\((.*?)\)/g;
     let match = input.match(regex);
     if (match) {
-        let parameters = match[0].slice(1, -1).split(',');
-        let queryParameters = parameters.map(param => {
-            let [key, value] = param.split('=');
-            if (value.startsWith("{") && value.endsWith("}")) {
-                value = "${" + value.slice(1, -1) + "}";
-            }
-            return `${key.trim()}=${value.trim()}`;
-        }).join('&');
-        return `\`${input.replace(regex, `?${queryParameters}`)}\``;
+      let parameters = match[0].slice(1, -1).split(',');
+      let queryParameters = parameters.map(param => {
+        let [key, value] = param.split('=');
+        if (value.startsWith("{") && value.endsWith("}")) {
+          value = "${" + value.slice(1, -1) + "}";
+        }
+        return `${key.trim()}=${value.trim()}`;
+      }).join('&');
+      return `\`${input.replace(regex, `?${queryParameters}`)}\``;
     }
     return `'${input}'`;
-}
+  }
 
 
   evaluate(expression, context) {
@@ -419,7 +418,7 @@ class ThymeleafJs {
 
     let expressionMatch;
     while ((expressionMatch = expressionRegex.exec(expr)) !== null) {
-      if (expressionMatch.input[0] === '*') 
+      if (expressionMatch.input[0] === '*')
         continue; // Ignore variables inside *{...}
       const expression = expressionMatch[1]
         .replace(quotedWordRegex, '')
