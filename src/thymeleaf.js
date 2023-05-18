@@ -21,7 +21,7 @@ class ThymeleafJs {
       'th:styleappend': this.processStyleAppend,
       'th:text': this.processText,
       'th:utext': this.processUText,
-      //'th:remove': this.processRemove, // WIP
+      'th:remove': this.processRemove, // WIP
     };
   }
 
@@ -194,6 +194,7 @@ class ThymeleafJs {
       // We append a copy of the clone
       const clone = parent.appendChild(originalClone.cloneNode(true));
       parent.insertBefore(clone, markerNode);
+
       this.processNode(clone, newContext);
 
       context.curContexts.pop();
@@ -227,39 +228,44 @@ class ThymeleafJs {
     const removalType = this.evaluate(attr.value, context);
     node.removeAttribute(attr.name);
 
-    // We let him continue the rendering
-    //console.log('before: ', node.outerHTML);
+    // all: Remove both the containing tag and all its children.
+    // body: Do not remove the containing tag, but remove all its children.
+    // tag: Remove the containing tag, but do not remove its children.
+    // all-but-first: Remove all children of the containing tag except the first one.
+    // none : Do nothing. This value is useful for dynamic evaluation.
+    switch (removalType) {
+      case 'all':
+        node.parentNode.removeChild(node);
+        break;
+
+      case 'body':
+        while (node.firstChild) {
+          node.removeChild(node.firstChild);
+        }
+        break;
+
+      case 'tag':
+        let fragment = context.document.createDocumentFragment();
+        while (node.firstChild) {
+          fragment.appendChild(node.firstChild);
+        }
+        node.parentNode.replaceChild(fragment, node);
+        break;
+        
+      case 'all-but-first':
+        while (node.children.length > 1) {
+          node.removeChild(node.lastChild);
+        }
+        break;
+      case 'none':
+      default:
+        // do nothing
+        break;
+    }
+
     this.processNode(node, context);
-    //console.log('after: ', node.outerHTML);
-
-
-    // switch (removalType) {
-    //   case 'all':
-    //     node.parentNode.removeChild(node);
-    //     break;
-    //   case 'body':
-    //     while (node.firstChild) {
-    //       node.removeChild(node.firstChild);
-    //     }
-    //     break;
-    //   case 'tag':
-    //     let fragment = document.createDocumentFragment();
-    //     while (node.firstChild) {
-    //       fragment.appendChild(node.firstChild);
-    //     }
-    //     node.parentNode.replaceChild(fragment, node);
-    //     break;
-    //   case 'all-but-first':
-    //     while (node.childNodes.length > 1) {
-    //       node.removeChild(node.lastChild);
-    //     }
-    //     break;
-    //   case 'none':
-    //   default:
-    //     // do nothing
-    //     break;
-    // }
   }
+
   processUText(node, attr, context) {
     const text = this.evaluate(attr.value, context);
     node.removeAttribute(attr.name);
