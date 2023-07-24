@@ -10,12 +10,12 @@ const __dirname = path.dirname(__filename);
 
 
 // const nodeConfig = {
-//   entry: './src/thymeleaf.node.js',
+//   entry: './src/thymescript.node.js',
 //   target: 'node',
 //   externals: [nodeExternals()],
 //   output: {
 //     path: path.resolve(__dirname, './dist'),
-//     filename: 'thymeleaf.node.js',
+//     filename: 'thymescript.node.js',
 //     libraryTarget: 'umd',
 //     libraryExport: 'default',
 //   },
@@ -23,16 +23,16 @@ const __dirname = path.dirname(__filename);
 
 
 const browserConfig = {
-  entry: './src/thymeleaf.js',
+  entry: './src/thymescript.js',
   target: 'web',
   output: {
     path: path.resolve(__dirname, './dist'),
-    filename: 'thymeleaf.js',
+    filename: 'thymescript.js',
     libraryTarget: 'umd',
     globalObject: 'this',
     libraryExport: 'default',
     umdNamedDefine: true,
-    library: 'ThymeleafJs',
+    library: 'ThymeScript',
   },
 };
 

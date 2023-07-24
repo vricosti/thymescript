@@ -7,7 +7,7 @@ import lists from './utilities/lists.js';
 const ELEMENT_NODE = 1;
 const TEXT_NODE = 3;
 
-class ThymeleafJs {
+class ThymeScript {
 
 
   constructor() {
@@ -40,14 +40,14 @@ class ThymeleafJs {
   }
 
   static render(html, userContext) {
-    const thymeleaf = new ThymeleafJs();
+    const thymeleaf = new ThymeScript();
     return thymeleaf.render(html, userContext);
   }
 
   render(html, userContext) {
 
 
-    const document = ThymeleafJs.createDOMParser(`${html}`);
+    const document = ThymeScript.createDOMParser(`${html}`);
 
     const context = {
       document: document,
@@ -485,4 +485,4 @@ class ThymeleafJs {
   }
 }
 
-export default ThymeleafJs;
+export default ThymeScript;
