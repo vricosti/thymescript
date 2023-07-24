@@ -1,8 +1,8 @@
-# ThymeleafJS 
+# ThymeScript 
 
-ThymeleafJs is a powerful and flexible JavaScript library for client-side HTML template rendering, inspired by Thymeleaf. 
+ThymeScript is a powerful and flexible JavaScript library for client-side HTML template rendering, inspired by Thymeleaf. 
 This library is perfect for those who are looking for a simple (8kB) yet powerful way to manipulate and render HTML templates using JavaScript.  
-<ins>**ThymeleafJs was generated with the help of ChatGPT (OpenAI), and its servitor to guide it.**<ins>
+<ins>**ThymeScript was generated with the help of ChatGPT (OpenAI), and its servitor to guide it.**<ins>
 
 ## Features
 
@@ -23,26 +23,26 @@ npm run build:prod
 
 ## Usage  
 
-### 1. Include ThymeleafJs in your HTML file
+### 1. Include ThymeScript in your HTML file
 
 ``` html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ThymeleafJs Example</title>
-    <script src="dist/thymeleaf.min.js"></script>
+    <title>ThymeScript Example</title>
+    <script src="dist/thymescript.min.js"></script>
     <script id="template">...SEE BELOW...</script>
 </head>
 <body>
   <div id="app">
-    <!-- !! The ThymeleafJs output will be inserted here !! -->
+    <!-- !! The ThymeScript output will be inserted here !! -->
   </div>
 </body>
 </html>
 ```
 
-### 2. Create an HTML template with ThymeleafJs attributes
+### 2. Create an HTML template with ThymeScript attributes
 
 ``` html
 <script id="template">
@@ -72,7 +72,7 @@ npm run build:prod
           }
       };
       
-      const output = ThymeleafJs.render(template, context);
+      const output = ThymeScript.render(template, context);
       document.getElementById('app').innerHTML = output;
     });
   </script>
@@ -132,7 +132,7 @@ const context = {
 };
 
 // render the 'invalid' (from DOM parser point of view) html
-const rendered = ThymeleafJs.render(template, context);
+const rendered = ThymeScript.render(template, context);
 const updatedTemplate = rendered
   .replace(/<my-tr/g, '<tr').replace(/<\/my-tr>/g, '</tr>')
   .replace(/<my-td/g, '<td').replace(/<\/my-td>/g, '</td>');
@@ -157,7 +157,7 @@ Contributions are welcome! Please open an issue or submit a pull request on GitH
 
 ## License  
 
-hymeleafJs is released under the MIT License. See the LICENSE file for more information.
+ThymeScript is released under the MIT License. See the LICENSE file for more information.
 
 
 

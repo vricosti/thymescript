@@ -1,4 +1,4 @@
-import ThymeleafJs from '../src/thymeleaf.node.js';
+import ThymeScript from '../src/thymescript.node.js';
 import pkg from 'dom-compare';
 
 const { compare } = pkg;
@@ -11,11 +11,11 @@ function renderAndCompare(msg, templateHtml, context, expectedHtml) {
   
   console.log(msg);
 
-  const renderedHtml = ThymeleafJs.render(templateHtml, context);
+  const renderedHtml = ThymeScript.render(templateHtml, context);
   console.log(renderedHtml);
   
-  const docRendered = ThymeleafJs.createDOMParser(renderedHtml);
-  const docExpected = ThymeleafJs.createDOMParser(expectedHtml);
+  const docRendered = ThymeScript.createDOMParser(renderedHtml);
+  const docExpected = ThymeScript.createDOMParser(expectedHtml);
   const result = compare(docExpected, docRendered);
   if (result.getResult()) {
     console.log('The elements are the same.\n');
@@ -140,12 +140,12 @@ renderAndCompare('Example02', html02, context02, expectedHtml02);
 const context03 = { condition: true };
 const html03 = `
 <span th:attr="class={condition ? 'base condition-true' : 'base condition-false'}">
-   This HTML is consolidated, which is good, but the Thymeleaf attribute still has some redundancy in it.
+   This HTML is consolidated, which is good, but the Thymescript attribute still has some redundancy in it.
 </span>
 `;
 const expectedHtml03 = `
 <span class="base condition-true">
-   This HTML is consolidated, which is good, but the Thymeleaf attribute still has some redundancy in it.
+   This HTML is consolidated, which is good, but the Thymescript attribute still has some redundancy in it.
 </span>
 `;
 renderAndCompare('Example03', html03, context03, expectedHtml03);
@@ -597,4 +597,10 @@ renderAndCompare('Example07', template07, context07, expectedHtml07);
   </div>
   `;
 
-  renderAndCompare('Example11', template11, context08, expectedHtml08);
+  const expectedHtml11 = `
+  <div id = "1" >
+    <p>dsqdqdqs</p>
+  </div>
+  `;
+
+  renderAndCompare('Example11', template11, context08, expectedHtml11);

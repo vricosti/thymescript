@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ThymeleafJs Example</title>
+  <title>ThymeScript Example</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <script src="../dist/thymeleaf.js"></script>
+  <script src="../dist/thymescript.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -76,7 +76,7 @@
           }
         },
       };
-      const output = ThymeleafJs.render(template, context);
+      const output = ThymeScript.render(template, context);
       document.getElementById('app').innerHTML = output;
     });
   </script> -->
@@ -138,14 +138,14 @@
           }
         ]
       };
-      const output = ThymeleafJs.render(template, context);
+      const output = ThymeScript.render(template, context);
       document.getElementById('app').innerHTML = output;
     });
   </script>
 </head>
 <body>
   <div id="app">
-    <!-- !! The ThymeleafJs output will be inserted here !! -->
+    <!-- !! The ThymeScript output will be inserted here !! -->
   </div>
 </body>
 </html>
